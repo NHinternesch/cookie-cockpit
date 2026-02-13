@@ -1,37 +1,25 @@
 Cookie Cockpit — The All-in-One Cookie Manager
 
-Cookie Cockpit gives you complete visibility and control over the cookies on any website you visit. Whether you're a web developer debugging session issues, a privacy-conscious user investigating trackers, or a QA engineer verifying cookie behavior, Cookie Cockpit puts everything in one clean dashboard.
+Cookie Cockpit gives you complete visibility and control over the cookies on any website. Made for web developers debugging session issues, tagging specialists and implementation engineers verifying cookie behavior as well as privacy-conscious users investigating trackers. 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 KEY FEATURES
 
 ● Live Cookie Dashboard
-View all cookies for the current site in a clean, sortable table. See cookie name, value, domain, path, expiration, size, and flags (Secure, HttpOnly, SameSite) at a glance.
+View all cookies for the current site in a clean list view and advanced detail view.
 
 ● Real-Time Monitoring
-Watch cookies change in real time. Cookie Cockpit highlights new, modified, and deleted cookies as they happen — no manual refresh needed.
-
-● Domain Discovery
-Automatically identifies all resource domains loaded by the page (first-party and third-party), so you can see exactly where cookies are coming from.
+Watch cookies change in real time. Cookie Cockpit listens to cookie changes and highlights new, modified, and deleted cookies as they happen — no manual refresh needed.
 
 ● Vendor Identification
-Recognizes cookies from known tracking vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
+Recognizes cookies from known vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
 
 ● Smart Filtering & Search
-Filter cookies by domain, name, or value. Toggle between first-party and third-party views. Quickly find the cookie you're looking for.
+Filter, sort, and search cookies by domain, name, or value.
 
-● Cookie Editing
-Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately.
-
-● Cookie Creation
-Create new cookies from scratch with full control over all attributes.
-
-● Cookie Deletion
-Delete individual cookies or clear all cookies for a domain with one click.
-
-● Visual Site Preview
-See a screenshot of the active tab alongside the cookie data for quick visual context.
+● Cookie Creation, Editing, Deletion
+Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately. Create new cookies from scratch with custom attributes. Delete individual cookies or clear all cookies for a domain with one click.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -41,7 +29,7 @@ Cookie Cockpit processes everything locally in your browser. No data is collecte
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-WHY THESE PERMISSIONS?
+WHY THE PERMISSIONS?
 
 Cookie Cockpit requires the following permissions to function:
 
@@ -56,4 +44,4 @@ BUILT FOR DEVELOPERS & POWER USERS
 
 Cookie Cockpit is designed to be fast, lightweight, and distraction-free. It uses no external libraries and runs entirely as a Manifest V3 Chrome extension with a minimal footprint.
 
-If you find a bug or have a feature request, visit hinternesch.com to get in touch.
+If you find a bug or have a feature request - get in touch!

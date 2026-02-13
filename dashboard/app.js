@@ -200,7 +200,6 @@
     for (const [key, el] of existingEls) {
       if (!newKeys.has(key)) {
         el.style.opacity = "0";
-        el.style.transform = "translateX(-20px)";
         setTimeout(() => el.remove(), 300);
       }
     }
@@ -232,56 +231,15 @@
 
       container.appendChild(el);
 
-      // Staggered pop-out animation
-      const delay = isInitial ? newCount * 40 : 0;
+      // Staggered fade-in from top to bottom
+      const delay = isInitial ? newCount * 60 : 0;
       setTimeout(() => el.classList.add("visible"), delay + 10);
       newCount++;
     });
 
     if (isInitial) {
       initialListRendered = true;
-      // After all items have popped in, auto-scroll from top to bottom
-      const totalAnimTime = newCount * 40 + 400;
-      setTimeout(() => autoScrollList(container), totalAnimTime);
     }
-  }
-
-  function autoScrollList(container) {
-    const scrollHeight = container.scrollHeight;
-    const clientHeight = container.clientHeight;
-    if (scrollHeight <= clientHeight) return;
-
-    const target = scrollHeight - clientHeight;
-    const downDuration = 1400;
-    const pauseDuration = 300;
-    const upDuration = 1200;
-
-    function easeInOutCubic(t) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    // Phase 1: scroll down
-    const downStart = performance.now();
-    function stepDown(now) {
-      const p = Math.min((now - downStart) / downDuration, 1);
-      container.scrollTop = target * easeInOutCubic(p);
-      if (p < 1) {
-        requestAnimationFrame(stepDown);
-      } else {
-        // Pause, then scroll back up
-        setTimeout(() => {
-          const upStart = performance.now();
-          function stepUp(now) {
-            const p = Math.min((now - upStart) / upDuration, 1);
-            container.scrollTop = target * (1 - easeInOutCubic(p));
-            if (p < 1) requestAnimationFrame(stepUp);
-          }
-          requestAnimationFrame(stepUp);
-        }, pauseDuration);
-      }
-    }
-
-    requestAnimationFrame(stepDown);
   }
 
   function flashFloatingCookie(key) {
