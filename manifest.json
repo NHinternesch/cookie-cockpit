@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Cookie Cockpit",
   "version": "1.0.0",
-  "description": "The all-in-one cookie manager. Live view of cookies and cookie details. Intuitive visualization. Tracking of live changes. Simple editing, modification, creation, and deletion.",
+  "description": "The all-in-one cookie manager. Intuitive visualization. Tracking live changes. Simple editing, creation, deletion.",
   "minimum_chrome_version": "116",
   "permissions": ["cookies", "tabs", "scripting"],
   "host_permissions": ["<all_urls>"],
