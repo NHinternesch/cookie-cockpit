@@ -1,0 +1,45 @@
+Chrome Web Store — Permissions Justification
+=============================================
+Paste each section into the corresponding field in the Chrome Web Store
+developer dashboard under "Privacy" → "Permissions justification".
+
+
+Permission: cookies
+-------------------
+Cookie Cockpit is a cookie management tool. The "cookies" permission is
+required for its core functionality: reading all cookies for the current
+site, creating new cookies, editing existing cookie values and attributes
+(domain, path, expiration, Secure, HttpOnly, SameSite), and deleting
+cookies. Without this permission the extension cannot function.
+
+
+Permission: tabs
+----------------
+The "tabs" permission is used for two purposes:
+1. Reading the active tab's URL and title to determine which site the user
+   is viewing, so the extension can display the correct cookies.
+2. Capturing a screenshot of the active tab (via chrome.tabs.captureVisibleTab)
+   to show a visual preview of the site in the cookie dashboard.
+
+
+Permission: scripting
+---------------------
+The "scripting" permission is used to inject a small content script into
+the active tab. This script discovers all resource domains loaded by the
+page (e.g., script sources, image sources, iframe origins) so the extension
+can show the user which first-party and third-party domains are setting
+cookies. The script only reads DOM attributes and does not modify the page.
+
+
+Host permission: <all_urls>
+---------------------------
+Cookie Cockpit is a general-purpose cookie manager that must work on any
+website the user visits. The "<all_urls>" host permission is required
+because:
+1. The chrome.cookies API requires host permissions for the domains whose
+   cookies are being accessed.
+2. The scripting API requires host permissions to inject the domain
+   discovery script.
+3. Users expect a cookie manager to work on every site, not a predefined
+   list of domains.
+This permission is not used to collect or transmit any user data.

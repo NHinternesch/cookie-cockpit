@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cookie Cockpit</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <img class="logo-icon" src="../icons/icon48.png" alt="Cookie Cockpit" />
+          <h1>Cookie Cockpit</h1>
+        </div>
+        <p class="monitored-url" id="monitoredUrl">Loading...</p>
+      </div>
+      <div class="header-right">
+        <span class="byline">by <a href="https://hinternesch.com" target="_blank">Nicolas Hinternesch</a></span>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <span class="stat-value" id="totalCount">0</span>
+        <span class="stat-label">Total Cookies</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="totalSize">0 B</span>
+        <span class="stat-label">Total Size</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="secureCount">0</span>
+        <span class="stat-label">Secure</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="httpOnlyCount">0</span>
+        <span class="stat-label">HttpOnly</span>
+      </div>
+      <div class="stat-card stat-card-split" id="partyCard">
+        <div class="stat-split">
+          <div class="stat-split-half">
+            <span class="stat-value" id="firstPartyCount">0</span>
+            <span class="stat-label">1st Party</span>
+          </div>
+          <div class="stat-split-half">
+            <span class="stat-value" id="thirdPartyCount">0</span>
+            <span class="stat-label">3rd Party</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card stat-card-split" id="typeCard">
+        <div class="stat-split">
+          <div class="stat-split-half">
+            <span class="stat-value" id="persistentCount">0</span>
+            <span class="stat-label">Persistent</span>
+          </div>
+          <div class="stat-split-half">
+            <span class="stat-value" id="sessionCount">0</span>
+            <span class="stat-label">Session</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search cookies by name, domain, or value..." />
+      </div>
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="firstParty">1st Party</button>
+        <button class="chip" data-filter="thirdParty">3rd Party</button>
+        <button class="chip" data-filter="secure">Secure</button>
+        <button class="chip" data-filter="httpOnly">HttpOnly</button>
+        <button class="chip" data-filter="session">Session</button>
+        <button class="chip" data-filter="persistent">Persistent</button>
+        <button class="chip" data-filter="large">Large</button>
+      </div>
+      <div class="sort-controls">
+        <label>Sort by</label>
+        <select id="sortSelect">
+          <option value="party">Party</option>
+          <option value="name">Name</option>
+          <option value="domain">Domain</option>
+          <option value="size">Size</option>
+          <option value="expiry">Expiry</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Visual Overview: iMac screenshot + floating cookies + live feed -->
+    <div class="overview-section">
+      <div class="visual-area">
+        <div class="imac-wrapper">
+          <div class="imac-frame">
+            <div class="imac-screen">
+              <img id="siteScreenshot" alt="" />
+              <div class="imac-placeholder" id="screenshotPlaceholder">
+                <span>🌐</span>
+                <p id="placeholderHost"></p>
+              </div>
+            </div>
+            <div class="imac-logo"></div>
+          </div>
+          <div class="imac-stand">
+            <div class="imac-neck"></div>
+            <div class="imac-base"></div>
+          </div>
+        </div>
+        <div class="cookie-list" id="cookieList">
+          <div class="cookie-list-empty">Loading cookies...</div>
+        </div>
+      </div>
+      <aside class="live-feed">
+        <h2 class="feed-title">
+          <span class="live-dot"></span>
+          Live Changes
+        </h2>
+        <div class="feed-list" id="feedList">
+          <div class="feed-empty">Watching for cookie changes...</div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Cookie Cards -->
+    <div class="cards-section">
+      <div class="section-header">
+        <h2 class="section-title">All Cookies</h2>
+        <div class="section-header-actions">
+          <button class="create-cookie-btn" id="createCookieBtn">Create Cookie</button>
+          <button class="delete-all-btn" id="deleteAllBtn">Delete All Cookies</button>
+        </div>
+      </div>
+      <div class="cookie-grid" id="cookieGrid">
+        <div class="empty-state" id="emptyState">
+          <span class="empty-icon">🍪</span>
+          <p>Fetching cookies...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie Detail Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="cookieModal">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

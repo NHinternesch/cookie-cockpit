@@ -1,0 +1,18 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+*.code-workspace
+.idea/
+
+# Build artifacts
+*.zip
+*.crx
+
+# Dependencies
+node_modules/
+
+# Packaging
+scripts/output/
