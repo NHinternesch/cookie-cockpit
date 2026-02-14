@@ -28,8 +28,7 @@ Edit any cookie value, expiration, domain, path, or flags directly from the dash
 Browsing data stays on your machine. Local processing only. No data is collected, stored, or sent to any external server. No analytics, no tracking, and no third-party services.
 
 • Free and open-source
-MIT License and source code is fully available on Github. https://github.com/NHinternesch/cookie-cockpit
+Free to use, MIT License, source code is fully available on Github.
 <br>
 
 Made with 𖡎 in Berlin/Germany │ 2026 <br>
-If you find a bug or have a feature request - get in touch!
