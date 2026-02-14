@@ -23,6 +23,6 @@ Browsing data stays on your machine. Local processing only. No data is collected
 
 • Free and open-source <br>
 Always free to use, MIT License, source code is fully available on Github.
-<br>
+<br><br>
 
 Made with 𖡎 in Berlin/Germany │ 2026 
