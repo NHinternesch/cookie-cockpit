@@ -18,14 +18,14 @@ Watch cookies change in real time. Cookie Cockpit listens to cookie changes and 
 • Vendor Identification
 Recognizes cookies from known vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
 
-• Cookie Creation, Editing, Deletion
+• Creation, Editing, Deletion
 Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately. Create new cookies from scratch with custom attributes. Delete individual cookies or clear all cookies for a domain with one click.
 
 • Security
 Browsing data stays on your machine. Local processing only. No data is collected, stored, or sent to any external server. No analytics, no tracking, and no third-party services.
 
 • Free and open-source
-Free to use, MIT License, source code is fully available on Github.
+Always free to use, MIT License, source code is fully available on Github.
 <br>
 
 Made with 𖡎 in Berlin/Germany │ 2026 <br>
