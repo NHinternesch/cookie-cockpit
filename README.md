@@ -9,7 +9,7 @@ Available soon on the Chrome Web Store.
 
 ## Key Features
 
-• Live Cookie Dashboard <br>
+• Intuitive Dashboard <br>
 View all cookies for the current site in a clean list view and advanced detail view. Filter, sort, and search cookies by domain, name, or value.
 
 • Real-Time Monitoring <br>
