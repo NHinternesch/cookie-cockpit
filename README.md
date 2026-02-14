@@ -10,16 +10,13 @@ Available soon on the Chrome Web Store.
 ## Key Features
 
 • Live Cookie Dashboard
-View all cookies for the current site in a clean list view and advanced detail view.
+View all cookies for the current site in a clean list view and advanced detail view. Filter, sort, and search cookies by domain, name, or value.
 
 • Real-Time Monitoring
 Watch cookies change in real time. Cookie Cockpit listens to cookie changes and highlights new, modified, and deleted cookies as they happen — no manual refresh needed.
 
 • Vendor Identification
 Recognizes cookies from known vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
-
-• Smart Filtering & Search
-Filter, sort, and search cookies by domain, name, or value.
 
 • Cookie Creation, Editing, Deletion
 Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately. Create new cookies from scratch with custom attributes. Delete individual cookies or clear all cookies for a domain with one click.
