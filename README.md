@@ -2,6 +2,8 @@
 
 Cookie Cockpit gives you complete visibility and control over the cookies on any website. Made for web developers, mar-tech professionals, tagging specialists, implementation engineers as well as privacy-conscious users.
 
+Available soon on the Chrome Web Store.
+
 <img width="761" height="476" alt="s" src="https://github.com/user-attachments/assets/6a256287-737c-4f0f-8c30-3f65cbc461f9" />
 
 
