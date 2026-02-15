@@ -25,4 +25,4 @@ Browsing data stays on your machine. Local processing only. No data is collected
 Always free to use, MIT License, source code is fully available on Github.
 <br><br>
 
-Made with 𖡎 and * in Berlin/Germany │ 2026 
+Made with 𖡎 and ✺ in Berlin/Germany │ 2026 
