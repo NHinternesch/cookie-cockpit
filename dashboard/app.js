@@ -1002,6 +1002,7 @@
 
   // ===== Vendor Identification =====
   const vendorExact = {
+    // Google & YouTube
     _ga: "Google Analytics", _gid: "Google Analytics",
     _fbp: "Meta", _fbc: "Meta", fr: "Meta",
     IDE: "DoubleClick", DSID: "DoubleClick", test_cookie: "DoubleClick",
@@ -1009,6 +1010,7 @@
     NID: "Google", SID: "Google", HSID: "Google", SSID: "Google",
     APISID: "Google", SAPISID: "Google", "1P_JAR": "Google",
     YSC: "YouTube", VISITOR_INFO1_LIVE: "YouTube", GPS: "YouTube",
+    // Social & Ads
     bcookie: "LinkedIn", lidc: "LinkedIn",
     UserMatchHistory: "LinkedIn", AnalyticsSyncHistory: "LinkedIn",
     _ttp: "TikTok",
@@ -1017,55 +1019,203 @@
     _scid: "Snapchat", sc_at: "Snapchat",
     MUID: "Microsoft Ads",
     obuid: "Outbrain",
+    // Marketing Automation
     hubspotutk: "HubSpot", __hstc: "HubSpot", __hssc: "HubSpot", __hssrc: "HubSpot",
+    // Consent Management
     OptanonConsent: "OneTrust", OptanonAlertBoxClosed: "OneTrust",
     CookieConsent: "Cookiebot",
     euconsent: "Didomi",
+    "euconsent-v2": "Didomi",
+    _iub_cs: "iubenda",
+    cmplz_consent_status: "Complianz", cmplz_marketing: "Complianz",
+    axeptio_authorized_vendors: "Axeptio", axeptio_cookies: "Axeptio",
+    sp_consent: "Sourcepoint",
+    _evidon_consent_ls: "Crownpeak",
+    // Server / Language
     PHPSESSID: "PHP", JSESSIONID: "Java", "ASP.NET_SessionId": "ASP.NET",
+    // Adobe Analytics
     s_cc: "Adobe Analytics", s_sq: "Adobe Analytics",
     s_vi: "Adobe Analytics", s_fid: "Adobe Analytics",
+    // Pinterest
     _derived_epik: "Pinterest", _epik: "Pinterest",
+    // Privacy Sandbox
     "receive-cookie-deprecation": "Privacy Sandbox",
+    // Piano
     atuserid: "Piano Analytics",
+    __pianoParams: "Piano Composer", __tbc: "Piano Composer",
+    xbc: "Piano Composer", __utp: "Piano ID",
+    // Paywall & Subscription
+    _tp: "Tinypass",
+    metered_paywall_views: "Leaky Paywall",
+    lura_auth: "Lura",
+    // CDPs
+    _schn: "Permutive",
+    rl_user_id: "RudderStack", rl_anonymous_id: "RudderStack",
+    _mfuuid_: "mParticle",
+    _td: "Treasure Data",
+    _sio: "Lytics",
+    // DMPs
+    _cc_id: "Lotame", _cc_aud: "Lotame", _cc_dc: "Lotame",
+    bk_uuid: "Oracle BlueKai",
+    kxlotame: "Lotame",
+    rlas3: "LiveRamp", rl_ec: "LiveRamp",
+    _li_ss: "Leadinfo",
+    // A/B Testing & Personalization
+    _vis_opt_exp: "VWO", _vis_opt_s: "VWO", _vis_opt_test_cookie: "VWO",
+    _vwo_uuid: "VWO",
+    ABTasty: "AB Tasty", ABTastySession: "AB Tasty",
+    ely_vID: "Kameleoon",
+    _dyjsession: "Dynamic Yield", _dy_c_exps: "Dynamic Yield",
+    _dy_geo: "Dynamic Yield", _dy_ses_load_seq: "Dynamic Yield",
+    mt_misc: "Monetate", mt_mop: "Monetate",
+    // Customer Engagement
+    _braze_api: "Braze",
+    __kla_id: "Klaviyo",
+    _mailchimp: "Mailchimp",
+    // Ad Tech
+    ttd_id: "The Trade Desk",
+    __qca: "Quantcast",
+    _lr_env: "LiveRamp",
+    _li_dcdm_c: "Linkedin Insights",
+    // Affiliate & Attribution
+    _ppcookie: "Post Affiliate Pro",
+    // Tag Management
+    _gtm_id: "Google Tag Manager",
+    // Chat & Support
+    __lc_cid: "LiveChat", __lc_cst: "LiveChat",
+    _fw_crm_v: "Freshworks",
+    // Session Replay & Analytics
+    _lr_tabs: "LogRocket", _lr_uf: "LogRocket",
+    _sn_n: "FullStory", _sn_a: "FullStory",
+    ab_test: "Google Optimize",
+    // E-commerce
+    _woocommerce_session: "WooCommerce",
+    _shopify_y: "Shopify", _shopify_s: "Shopify",
+    cart_id: "BigCommerce",
+    // CDN & Performance
+    __cfduid: "Cloudflare",
+    _fastly: "Fastly",
+    incap_ses: "Imperva", visid_incap: "Imperva",
+    ak_bmsc: "Akamai", bm_sv: "Akamai", bm_sz: "Akamai",
+    // Bot Detection
+    _px3: "PerimeterX", _pxhd: "PerimeterX", _pxvid: "PerimeterX",
+    __cf_bm: "Cloudflare Bot Management",
+    datadome: "DataDome",
+    reese84: "Shape Security",
   };
 
   const vendorPrefixes = [
+    // Google & Ads
     ["_ga_", "Google Analytics"], ["_gat", "Google Analytics"], ["__utm", "Google Analytics"],
     ["_gcl_", "Google Ads"], ["_gac_", "Google Ads"],
+    // Social
     ["_tt_", "TikTok"],
     ["_pin_", "Pinterest"],
     ["li_", "LinkedIn"],
     ["_uet", "Microsoft Ads"], ["_uetvid", "Microsoft Ads"],
+    // Marketing Automation
     ["__hs", "HubSpot"],
+    // Session Replay & Analytics
     ["_hjid", "Hotjar"], ["_hj", "Hotjar"],
     ["_clck", "Clarity"], ["_clsk", "Clarity"],
     ["mp_", "Mixpanel"],
-    ["ajs_", "Segment"],
     ["amp_", "Amplitude"],
     ["_hp2_", "Heap"],
     ["_cs_", "ContentSquare"],
     ["_pk_", "Matomo"],
     ["_dd_", "Datadog"],
+    ["_lr_", "LogRocket"],
+    ["_fs_", "FullStory"],
+    ["_sn_", "FullStory"],
+    // Piano
     ["_at.", "Piano Analytics"], ["at_", "Piano Analytics"],
     ["pa_", "Piano Analytics"], ["_pcid", "Piano Analytics"],
     ["_pctx", "Piano Analytics"], ["_pprv", "Piano Analytics"],
+    ["__piano", "Piano Composer"], ["tp_", "Piano Composer"],
+    // Adobe
     ["AMCV_", "Adobe Analytics"], ["AMCVS_", "Adobe Analytics"],
     ["s_", "Adobe Analytics"],
+    ["mbox", "Adobe Target"], ["at_", "Adobe Target"],
+    // CDN & Infrastructure
     ["__cf", "Cloudflare"], ["cf_", "Cloudflare"],
     ["__stripe", "Stripe"],
+    // Ad Tech
     ["__adroll", "AdRoll"],
     ["cto_", "Criteo"],
     ["t_gid", "Taboola"], ["taboola_", "Taboola"],
+    ["_ljtrtb_", "Livejournal"],
+    ["ttd_", "The Trade Desk"],
+    // Chat & Engagement
     ["drift", "Drift"],
     ["intercom-", "Intercom"],
+    // Marketing
     ["_mkto_", "Marketo"],
     ["sfdc-", "Salesforce"],
+    ["pardot", "Pardot"],
     ["_zd", "Zendesk"],
+    // Consent Management
     ["didomi", "Didomi"],
     ["cmapi_", "TrustArc"],
     ["uc_", "Usercentrics"],
+    ["iub_", "iubenda"],
+    ["cmplz_", "Complianz"],
+    ["axeptio_", "Axeptio"],
+    ["sp_", "Sourcepoint"],
+    ["qc_", "Quantcast Choice"],
+    // CDPs
+    ["ajs_", "Segment"],
+    ["rl_", "RudderStack"],
+    ["teal_", "Tealium"], ["utag_", "Tealium"],
+    ["_mparticle_", "mParticle"], ["mprtcl-", "mParticle"],
+    ["_td_", "Treasure Data"],
+    ["seerid", "Lytics"], ["_sio_", "Lytics"],
+    ["_bc_", "BlueConic"], ["bc_", "BlueConic"],
+    // DMPs
+    ["_cc_", "Lotame"],
+    ["bk_", "Oracle BlueKai"],
+    ["kx", "Krux/Salesforce DMP"],
+    ["permutive-", "Permutive"], ["_prmtv_", "Permutive"],
+    ["_lr_", "LiveRamp"], ["rlas", "LiveRamp"],
+    // A/B Testing & Personalization
+    ["_vis_opt_", "VWO"], ["_vwo_", "VWO"],
+    ["optimizelyenduser", "Optimizely"], ["optimizely", "Optimizely"],
+    ["abtasty", "AB Tasty"],
+    ["kameleoon", "Kameleoon"], ["ely_", "Kameleoon"],
+    ["_dy_", "Dynamic Yield"],
+    ["mt_", "Monetate"],
+    ["_lp_", "LaunchDarkly"],
+    ["split_", "Split.io"],
+    // Customer Engagement
+    ["_braze", "Braze"],
+    ["__kla_", "Klaviyo"],
+    ["_iterable_", "Iterable"],
+    // Affiliate & Attribution
+    ["_branch_", "Branch.io"], ["branch_", "Branch.io"],
+    ["_appsflyer", "AppsFlyer"],
+    ["_adjust_", "Adjust"],
+    // CMS & E-commerce
     ["wp-", "WordPress"], ["wordpress_", "WordPress"],
     ["_shopify", "Shopify"],
+    ["_woo", "WooCommerce"],
+    ["_magento", "Magento"],
+    // Paywall & Subscription
+    ["piano_", "Piano"], ["__tp_", "Piano"],
+    ["leaky_paywall_", "Leaky Paywall"],
+    ["zuora_", "Zuora"],
+    ["chargebee_", "Chargebee"],
+    ["recurly_", "Recurly"],
+    ["pelcro_", "Pelcro"],
+    ["poool_", "Poool"],
+    // Bot Detection
+    ["_px", "PerimeterX"],
+    ["incap_", "Imperva"], ["visid_incap", "Imperva"],
+    ["ak_bmsc", "Akamai"], ["bm_", "Akamai"],
+    ["datadome", "DataDome"],
+    // Session Replay
+    ["jarvis_", "Mouseflow"],
+    ["_ueq_", "Userpilot"],
+    ["pendo_", "Pendo"],
+    ["_gainsight_", "Gainsight"],
   ];
 
   function identifyVendor(cookieName) {

@@ -16,3 +16,6 @@ node_modules/
 
 # Packaging
 scripts/output/
+
+# Notes
+notes-next-release.txt
