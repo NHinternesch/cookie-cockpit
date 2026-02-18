@@ -1,8 +1,9 @@
 # Cookie Cockpit - The All-In-One Cookie Manager
 
-[Cookie Cockpit](https://cookie-cockpit.hinternesch.com) gives you complete visibility and control over the cookies on any website. Made for web developers, mar-tech professionals, tagging specialists, implementation engineers as well as privacy-conscious users.
+Cookie Cockpit gives you complete visibility and control over the cookies on any website. Made for web developers, mar-tech professionals, tagging specialists, implementation engineers as well as privacy-conscious users.
 
-[Available on the Chrome Web Store]([https://cookie-cockpit.hinternesch.com](https://chromewebstore.google.com/detail/cookie-cockpit/nlipegfmejhndebcoogldgfojaalibph))
+[Landing Page](https://cookie-cockpit.hinternesch.com) <br>
+[Available on the Chrome Web Store](https://chromewebstore.google.com/detail/cookie-cockpit/nlipegfmejhndebcoogldgfojaalibph)
 
 ## Key Features
 
