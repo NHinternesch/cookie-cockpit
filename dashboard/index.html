@@ -34,14 +34,8 @@
         <span class="stat-value" id="totalSize">0 B</span>
         <span class="stat-label">Total Size</span>
       </div>
-      <div class="stat-card">
-        <span class="stat-value" id="secureCount">0</span>
-        <span class="stat-label">Secure</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value" id="httpOnlyCount">0</span>
-        <span class="stat-label">HttpOnly</span>
-      </div>
+      <span id="secureCount" hidden>0</span>
+      <span id="httpOnlyCount" hidden>0</span>
       <div class="stat-card stat-card-split" id="partyCard">
         <div class="stat-split">
           <div class="stat-split-half">
@@ -74,16 +68,16 @@
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
         </svg>
-        <input type="text" id="searchInput" placeholder="Search cookies by name, domain, or value..." />
+        <input type="text" id="searchInput" placeholder="Search by name, domain, value, or vendor..." />
       </div>
       <div class="filter-chips">
         <button class="chip active" data-filter="all">All</button>
         <button class="chip" data-filter="firstParty">1st Party</button>
         <button class="chip" data-filter="thirdParty">3rd Party</button>
+        <button class="chip" data-filter="persistent">Persistent</button>
+        <button class="chip" data-filter="session">Session</button>
         <button class="chip" data-filter="secure">Secure</button>
         <button class="chip" data-filter="httpOnly">HttpOnly</button>
-        <button class="chip" data-filter="session">Session</button>
-        <button class="chip" data-filter="persistent">Persistent</button>
         <button class="chip" data-filter="large">Large</button>
       </div>
       <div class="sort-controls">

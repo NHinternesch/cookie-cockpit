@@ -1,7 +1,23 @@
 // Cookie Cockpit — Background Service Worker
 
 const dashboardConnections = new Map(); // port → { sourceHost, domains }
-const pendingScans = new Map(); // tabId → { url, domains, screenshot }
+
+// Persist scan data in session storage so it survives service worker restarts
+async function getScan(tabId) {
+  const key = `scan_${tabId}`;
+  const data = await chrome.storage.session.get(key);
+  return data[key] || null;
+}
+
+async function setScan(tabId, scanData) {
+  const key = `scan_${tabId}`;
+  await chrome.storage.session.set({ [key]: scanData });
+}
+
+async function removeScan(tabId) {
+  const key = `scan_${tabId}`;
+  await chrome.storage.session.remove(key);
+}
 
 chrome.action.onClicked.addListener(async (tab) => {
   // Capture a screenshot of the visible tab
@@ -27,7 +43,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
   } catch {}
 
-  pendingScans.set(tab.id, { url: tab.url, domains, screenshot });
+  await setScan(tab.id, { url: tab.url, domains, screenshot });
 
   const dashboardUrl = chrome.runtime.getURL(
     `dashboard/index.html?url=${encodeURIComponent(tab.url)}&tabId=${tab.id}&title=${encodeURIComponent(tab.title || "")}`
@@ -151,7 +167,7 @@ chrome.runtime.onConnect.addListener((port) => {
     }
     if (msg.type === "get-cookies") {
       const tabId = msg.tabId;
-      const scan = pendingScans.get(tabId);
+      const scan = await getScan(tabId);
       const sourceUrl = msg.url || scan?.url || "";
       const pageDomains = scan?.domains || [];
       const screenshot = scan?.screenshot || null;
@@ -182,7 +198,7 @@ chrome.runtime.onConnect.addListener((port) => {
 // --- Clean up scan data when the original tab is closed ---
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  pendingScans.delete(tabId);
+  removeScan(tabId);
 });
 
 // --- Cookie change events — scoped per dashboard ---

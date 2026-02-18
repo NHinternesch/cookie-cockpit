@@ -40,7 +40,9 @@ zip -r "$OUTPUT_PATH" . \
   -x "*.code-workspace" \
   -x "node_modules/*" \
   -x ".vscode/*" \
-  -x "Thumbs.db"
+  -x "Thumbs.db" \
+  -x "notes-*" \
+  -x "*.txt"
 
 echo ""
 echo "Created: $OUTPUT_NAME"

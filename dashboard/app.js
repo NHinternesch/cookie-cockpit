@@ -12,6 +12,7 @@
     search: "",
     sort: "party",
     feedItems: [],
+    openModalCookieKey: null,
   };
 
   // ===== DOM =====
@@ -143,6 +144,7 @@
     renderStats();
     renderFloatingCookies();
     renderCookies();
+    refreshOpenModal();
   }
 
   function renderStats() {
@@ -213,11 +215,26 @@
 
     cookies.forEach((cookie) => {
       const key = cookieKey(cookie);
-      if (existingEls.has(key)) return;
+
+      if (existingEls.has(key)) {
+        // Update existing item content and click handler
+        const el = existingEls.get(key);
+        const first = isFirstParty(cookie);
+        const vendor = identifyVendor(cookie.name, cookie.domain);
+        el.className = el.className.replace(/first-party|third-party/, first ? "first-party" : "third-party");
+        el.innerHTML = `
+          <span class="cookie-list-dot"></span>
+          <span class="cookie-list-name">${esc(cookie.name)}</span>
+          ${vendor ? `<span class="cookie-list-vendor">${esc(vendor)}</span>` : ""}
+          <span class="cookie-list-domain">${esc(cookie.domain)}</span>
+        `;
+        el.onclick = () => openModal(cookie);
+        return;
+      }
 
       const el = document.createElement("div");
       const first = isFirstParty(cookie);
-      const vendor = identifyVendor(cookie.name);
+      const vendor = identifyVendor(cookie.name, cookie.domain);
       el.className = `cookie-list-item ${first ? "first-party" : "third-party"}`;
       el.dataset.key = key;
       el.innerHTML = `
@@ -236,6 +253,13 @@
       setTimeout(() => el.classList.add("visible"), delay + 10);
       newCount++;
     });
+
+    // Reorder existing items to match the sorted order
+    for (const cookie of cookies) {
+      const key = cookieKey(cookie);
+      const el = container.querySelector(`[data-key="${CSS.escape(key)}"]`);
+      if (el) container.appendChild(el);
+    }
 
     if (isInitial) {
       initialListRendered = true;
@@ -337,7 +361,7 @@
     if (!card.className.includes("-party")) card.classList.add(partyClass);
     if (!/\b(session|persistent)\b/.test(card.className)) card.classList.add(typeClass);
 
-    const vendor = identifyVendor(cookie.name);
+    const vendor = identifyVendor(cookie.name, cookie.domain);
 
     card.innerHTML = `
       <div class="cookie-card-header">
@@ -397,12 +421,15 @@
 
     if (state.search) {
       const q = state.search.toLowerCase();
-      cookies = cookies.filter(
-        (c) =>
+      cookies = cookies.filter((c) => {
+        const vendor = identifyVendor(c.name, c.domain);
+        return (
           c.name.toLowerCase().includes(q) ||
           c.domain.toLowerCase().includes(q) ||
-          c.value.toLowerCase().includes(q)
-      );
+          c.value.toLowerCase().includes(q) ||
+          (vendor && vendor.toLowerCase().includes(q))
+        );
+      });
     }
 
     cookies.sort((a, b) => {
@@ -461,10 +488,11 @@
 
   // ===== Modal (editable properties) =====
   function openModal(cookie) {
+    state.openModalCookieKey = cookieKey(cookie);
     const first = isFirstParty(cookie);
     const partyText = first ? "1st Party Cookie" : "3rd Party Cookie";
     const partyClass = first ? "first-party" : "third-party";
-    const vendor = identifyVendor(cookie.name);
+    const vendor = identifyVendor(cookie.name, cookie.domain);
 
     // Build expiration datetime-local value
     let expiresValue = "";
@@ -709,7 +737,24 @@
   }
 
   function closeModal() {
+    state.openModalCookieKey = null;
     dom.modalOverlay.classList.remove("open");
+  }
+
+  function refreshOpenModal() {
+    if (!state.openModalCookieKey) return;
+    if (!dom.modalOverlay.classList.contains("open")) return;
+    const cookie = state.cookies.get(state.openModalCookieKey);
+    if (!cookie) {
+      // Cookie was removed — close the modal
+      closeModal();
+      return;
+    }
+    // Only refresh if user is not actively editing (textarea not focused)
+    const activeEl = document.activeElement;
+    const isEditing = activeEl && (activeEl.tagName === "TEXTAREA" || activeEl.tagName === "INPUT" || activeEl.tagName === "SELECT");
+    if (isEditing) return;
+    openModal(cookie);
   }
 
   // ===== Create Cookie Modal =====
@@ -1036,6 +1081,11 @@
     // Adobe Analytics
     s_cc: "Adobe Analytics", s_sq: "Adobe Analytics",
     s_vi: "Adobe Analytics", s_fid: "Adobe Analytics",
+    s_ecid: "Adobe Analytics", s_ppv: "Adobe Analytics",
+    // Adobe Target
+    at_check: "Adobe Target", at_lojson: "Adobe Target",
+    // Segment
+    ajs_user_id: "Segment", ajs_anonymous_id: "Segment",
     // Pinterest
     _derived_epik: "Pinterest", _epik: "Pinterest",
     // Privacy Sandbox
@@ -1061,7 +1111,6 @@
     rlas3: "LiveRamp", rl_ec: "LiveRamp",
     _li_ss: "Leadinfo",
     // A/B Testing & Personalization
-    _vis_opt_exp: "VWO", _vis_opt_s: "VWO", _vis_opt_test_cookie: "VWO",
     _vwo_uuid: "VWO",
     ABTasty: "AB Tasty", ABTastySession: "AB Tasty",
     ely_vID: "Kameleoon",
@@ -1085,8 +1134,6 @@
     __lc_cid: "LiveChat", __lc_cst: "LiveChat",
     _fw_crm_v: "Freshworks",
     // Session Replay & Analytics
-    _lr_tabs: "LogRocket", _lr_uf: "LogRocket",
-    _sn_n: "FullStory", _sn_a: "FullStory",
     ab_test: "Google Optimize",
     // E-commerce
     _woocommerce_session: "WooCommerce",
@@ -1134,8 +1181,7 @@
     ["__piano", "Piano Composer"], ["tp_", "Piano Composer"],
     // Adobe
     ["AMCV_", "Adobe Analytics"], ["AMCVS_", "Adobe Analytics"],
-    ["s_", "Adobe Analytics"],
-    ["mbox", "Adobe Target"], ["at_", "Adobe Target"],
+    ["mbox", "Adobe Target"],
     // CDN & Infrastructure
     ["__cf", "Cloudflare"], ["cf_", "Cloudflare"],
     ["__stripe", "Stripe"],
@@ -1161,7 +1207,7 @@
     ["cmplz_", "Complianz"],
     ["axeptio_", "Axeptio"],
     ["sp_", "Sourcepoint"],
-    ["qc_", "Quantcast Choice"],
+    ["qc_", "Quantcast Choice"], ["_qc_", "Quantcast"],
     // CDPs
     ["ajs_", "Segment"],
     ["rl_", "RudderStack"],
@@ -1173,7 +1219,7 @@
     // DMPs
     ["_cc_", "Lotame"],
     ["bk_", "Oracle BlueKai"],
-    ["kx", "Krux/Salesforce DMP"],
+    ["kx_", "Krux/Salesforce DMP"],
     ["permutive-", "Permutive"], ["_prmtv_", "Permutive"],
     ["_lr_", "LiveRamp"], ["rlas", "LiveRamp"],
     // A/B Testing & Personalization
@@ -1218,12 +1264,118 @@
     ["_gainsight_", "Gainsight"],
   ];
 
-  function identifyVendor(cookieName) {
-    const exact = vendorExact[cookieName];
+  const vendorDomains = {
+    // Google
+    "doubleclick.net": "DoubleClick",
+    "google-analytics.com": "Google Analytics",
+    "googleadservices.com": "Google Ads",
+    "googlesyndication.com": "Google Ad Manager",
+    "googletagmanager.com": "Google Tag Manager",
+    "googleapis.com": "Google",
+    "youtube.com": "YouTube",
+    "ytimg.com": "YouTube",
+    // Social & Ads
+    "facebook.com": "Meta", "facebook.net": "Meta", "fbcdn.net": "Meta",
+    "instagram.com": "Meta",
+    "linkedin.com": "LinkedIn",
+    "tiktok.com": "TikTok", "tiktokcdn.com": "TikTok",
+    "twitter.com": "Twitter/X", "x.com": "Twitter/X", "twimg.com": "Twitter/X",
+    "snapchat.com": "Snapchat", "sc-cdn.net": "Snapchat",
+    "pinterest.com": "Pinterest",
+    "reddit.com": "Reddit",
+    "outbrain.com": "Outbrain",
+    "taboola.com": "Taboola",
+    // Ad Tech
+    "criteo.com": "Criteo", "criteo.net": "Criteo",
+    "adroll.com": "AdRoll",
+    "adsrvr.org": "The Trade Desk",
+    "quantserve.com": "Quantcast",
+    "bluekai.com": "Oracle BlueKai",
+    "demdex.net": "Adobe Audience Manager",
+    "krux.net": "Krux/Salesforce DMP",
+    "rubiconproject.com": "Rubicon Project",
+    "pubmatic.com": "PubMatic",
+    "openx.net": "OpenX",
+    "casalemedia.com": "Index Exchange",
+    "indexww.com": "Index Exchange",
+    "bidswitch.net": "Bidswitch",
+    "adnxs.com": "Xandr/AppNexus",
+    "liveramp.com": "LiveRamp",
+    // Consent Management
+    "trustarc.com": "TrustArc",
+    "onetrust.com": "OneTrust",
+    "cookiebot.com": "Cookiebot",
+    "didomi.io": "Didomi",
+    "sourcepoint.com": "Sourcepoint",
+    "usercentrics.eu": "Usercentrics",
+    // Analytics & Session Replay
+    "hotjar.com": "Hotjar",
+    "clarity.ms": "Clarity",
+    "mixpanel.com": "Mixpanel",
+    "amplitude.com": "Amplitude",
+    "heap.io": "Heap",
+    "contentsquare.net": "ContentSquare",
+    "fullstory.com": "FullStory",
+    "logrocket.com": "LogRocket",
+    "mouseflow.com": "Mouseflow",
+    // Marketing Automation
+    "hubspot.com": "HubSpot", "hsforms.com": "HubSpot",
+    "marketo.net": "Marketo", "marketo.com": "Marketo",
+    "pardot.com": "Pardot",
+    "klaviyo.com": "Klaviyo",
+    "braze.com": "Braze",
+    // CDN & Performance
+    "cloudflare.com": "Cloudflare",
+    "akamai.net": "Akamai", "akamaized.net": "Akamai",
+    "fastly.net": "Fastly",
+    "imperva.com": "Imperva", "incapdns.net": "Imperva",
+    // Piano
+    "piano.io": "Piano", "tinypass.com": "Piano",
+    "at-o.net": "Piano Analytics",
+    // CDPs
+    "segment.io": "Segment", "segment.com": "Segment",
+    "rudderstack.com": "RudderStack",
+    "tealium.com": "Tealium",
+    "mparticle.com": "mParticle",
+    "treasuredata.com": "Treasure Data",
+    // Customer Data
+    "lotame.com": "Lotame",
+    "permutive.com": "Permutive",
+    "blueconic.net": "BlueConic",
+    // A/B Testing
+    "optimizely.com": "Optimizely",
+    "abtasty.com": "AB Tasty",
+    "kameleoon.com": "Kameleoon",
+    "dynamicyield.com": "Dynamic Yield",
+    // Bot Detection
+    "perimeterx.net": "PerimeterX",
+    "datadome.co": "DataDome",
+    "shapesecurity.com": "Shape Security",
+    // Payments
+    "stripe.com": "Stripe",
+    // Chat
+    "drift.com": "Drift",
+    "intercom.io": "Intercom",
+    "livechatinc.com": "LiveChat",
+    "freshworks.com": "Freshworks",
+    "zendesk.com": "Zendesk",
+  };
+
+  function identifyVendor(cookieName, domain) {
+    // 1. Exact match (case-sensitive, then lowercase fallback)
+    const exact = vendorExact[cookieName] || vendorExact[cookieName.toLowerCase()];
     if (exact) return exact;
+    // 2. Prefix match
     const lower = cookieName.toLowerCase();
     for (const [prefix, vendor] of vendorPrefixes) {
       if (lower.startsWith(prefix)) return vendor;
+    }
+    // 3. Domain match (if domain provided)
+    if (domain) {
+      const d = domain.toLowerCase().replace(/^\./, "");
+      for (const [domainKey, vendor] of Object.entries(vendorDomains)) {
+        if (d === domainKey || d.endsWith("." + domainKey)) return vendor;
+      }
     }
     return null;
   }
