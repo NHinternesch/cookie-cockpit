@@ -335,11 +335,11 @@ body {
 }
 
 .sort-controls select {
-  padding: 8px 12px;
+  padding: 7px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  border-radius: 20px;
+  color: var(--text-secondary);
   font-size: 13px;
   font-family: var(--font);
   cursor: pointer;
@@ -349,12 +349,60 @@ body {
 
 .sort-controls select:focus { border-color: var(--accent); }
 
+/* ===== Vendor Filter Tooltip ===== */
+.vendor-filter-wrapper { position: relative; }
+
+.vendor-info-trigger {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  cursor: help;
+  position: relative;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.vendor-info-trigger:hover,
+.vendor-info-trigger:focus { color: var(--text-secondary); }
+
+.vendor-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.vendor-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 12px;
+  border: 6px solid transparent;
+  border-top-color: var(--border-light);
+}
+
+.vendor-info-trigger:hover .vendor-tooltip,
+.vendor-info-trigger:focus .vendor-tooltip { display: block; }
+
+
 /* ===== Overview Section (Visual + Live Feed) ===== */
 .overview-section {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 24px;
   margin-bottom: 36px;
+  position: relative;
 }
 
 /* ===== Visual Area (iMac + Cookie List) ===== */
@@ -507,14 +555,15 @@ body {
   font-size: 12px;
   font-family: var(--font-mono);
   cursor: default;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
   opacity: 0;
+  transform: translateX(-60px) scale(0.92);
   flex-shrink: 0;
 }
 
 .cookie-list-item.visible {
   opacity: 1;
-  transition: opacity 0.8s ease, background 0.2s ease;
+  transform: translateX(0) scale(1);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease;
 }
 
 .cookie-list-item:hover {
@@ -795,12 +844,16 @@ body {
 
 /* ===== Live Feed ===== */
 .live-feed {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
   padding: 24px 0 0 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   border-left: 1px solid var(--border);
-  min-height: 0;
 }
 
 .feed-title {
@@ -1172,6 +1225,37 @@ body {
   transform: none;
 }
 
+.export-csv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.export-csv-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.export-csv-btn:active {
+  transform: translateY(0);
+}
+
+.export-csv-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
 /* ===== Modal Toggle Switch ===== */
 .modal-toggle {
   position: relative;
@@ -1313,7 +1397,7 @@ body {
 /* Live feed drops below, visual area still side-by-side */
 @media (max-width: 1100px) {
   .overview-section { grid-template-columns: 1fr; }
-  .live-feed { max-height: 400px; border-left: none; border-top: 1px solid var(--border); padding: 16px 0 0 0; }
+  .live-feed { position: static; width: auto; max-height: 400px; border-left: none; border-top: 1px solid var(--border); padding: 16px 0 0 0; }
   .stats-bar { grid-template-columns: repeat(3, 1fr); }
 }
 

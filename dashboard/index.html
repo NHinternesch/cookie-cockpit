@@ -80,6 +80,17 @@
         <button class="chip" data-filter="httpOnly">HttpOnly</button>
         <button class="chip" data-filter="large">Large</button>
       </div>
+      <div class="sort-controls vendor-filter-wrapper">
+        <select id="vendorSelect">
+          <option value="all">All Vendors</option>
+        </select>
+        <div class="vendor-info-trigger" tabindex="0">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"/>
+          </svg>
+          <div class="vendor-tooltip">Vendors are identified by matching cookie names and domains against a built-in dictionary of known patterns. Cookies from unsupported vendors or with custom names may show as unidentified.</div>
+        </div>
+      </div>
       <div class="sort-controls">
         <label>Sort by</label>
         <select id="sortSelect">
@@ -134,8 +145,9 @@
       <div class="section-header">
         <h2 class="section-title">Detail View</h2>
         <div class="section-header-actions">
-          <button class="create-cookie-btn" id="createCookieBtn">Create Cookie</button>
-          <button class="delete-all-btn" id="deleteAllBtn">Delete All Cookies</button>
+          <button class="create-cookie-btn" id="createCookieBtn">Create</button>
+          <button class="delete-all-btn" id="deleteAllBtn">Delete All</button>
+          <button class="export-csv-btn" id="exportCsvBtn">Export All</button>
         </div>
       </div>
       <div class="cookie-grid" id="cookieGrid">

@@ -11,6 +11,7 @@
     filter: "all",
     search: "",
     sort: "party",
+    vendorFilter: "all",
     feedItems: [],
     openModalCookieKey: null,
   };
@@ -33,6 +34,7 @@
     typeCard: $("#typeCard"),
     searchInput: $("#searchInput"),
     sortSelect: $("#sortSelect"),
+    vendorSelect: $("#vendorSelect"),
     cookieGrid: $("#cookieGrid"),
     feedList: $("#feedList"),
     cookieList: $("#cookieList"),
@@ -44,6 +46,7 @@
     modalClose: $("#modalClose"),
     deleteAllBtn: $("#deleteAllBtn"),
     createCookieBtn: $("#createCookieBtn"),
+    exportCsvBtn: $("#exportCsvBtn"),
     particles: $("#particles"),
   };
 
@@ -141,10 +144,48 @@
 
   // ===== Rendering =====
   function renderAll() {
+    updateVendorDropdown();
     renderStats();
     renderFloatingCookies();
     renderCookies();
     refreshOpenModal();
+  }
+
+  function updateVendorDropdown() {
+    const cookies = Array.from(state.cookies.values());
+    const vendors = new Set();
+    let hasUnknown = false;
+
+    for (const c of cookies) {
+      const v = identifyVendor(c.name, c.domain);
+      if (v) vendors.add(v);
+      else hasUnknown = true;
+    }
+
+    const sorted = Array.from(vendors).sort((a, b) => a.localeCompare(b));
+    const prev = dom.vendorSelect.value;
+
+    dom.vendorSelect.innerHTML = '<option value="all">All Vendors</option>';
+    for (const v of sorted) {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      dom.vendorSelect.appendChild(opt);
+    }
+    if (hasUnknown) {
+      const opt = document.createElement("option");
+      opt.value = "unknown";
+      opt.textContent = "Unknown";
+      dom.vendorSelect.appendChild(opt);
+    }
+
+    // Preserve selection if still valid
+    if (prev && dom.vendorSelect.querySelector(`option[value="${CSS.escape(prev)}"]`)) {
+      dom.vendorSelect.value = prev;
+    } else {
+      dom.vendorSelect.value = "all";
+      state.vendorFilter = "all";
+    }
   }
 
   function renderStats() {
@@ -248,7 +289,7 @@
 
       container.appendChild(el);
 
-      // Staggered fade-in from top to bottom
+      // Staggered slide-in from iMac direction
       const delay = isInitial ? newCount * 60 : 0;
       setTimeout(() => el.classList.add("visible"), delay + 10);
       newCount++;
@@ -285,7 +326,7 @@
       const empty = document.createElement("div");
       empty.className = "empty-state";
       empty.innerHTML =
-        state.search || state.filter !== "all"
+        state.search || state.filter !== "all" || state.vendorFilter !== "all"
           ? '<span class="empty-icon">🔍</span><p>No cookies match your filters</p>'
           : '<span class="empty-icon">🍪</span><p>No cookies found for this page</p>';
       dom.cookieGrid.appendChild(empty);
@@ -429,6 +470,14 @@
           c.value.toLowerCase().includes(q) ||
           (vendor && vendor.toLowerCase().includes(q))
         );
+      });
+    }
+
+    if (state.vendorFilter !== "all") {
+      cookies = cookies.filter((c) => {
+        const vendor = identifyVendor(c.name, c.domain);
+        if (state.vendorFilter === "unknown") return !vendor;
+        return vendor === state.vendorFilter;
       });
     }
 
@@ -961,6 +1010,12 @@
       renderCookies();
     });
 
+    dom.vendorSelect.addEventListener("change", (e) => {
+      state.vendorFilter = e.target.value;
+      renderFloatingCookies();
+      renderCookies();
+    });
+
     dom.modalClose.addEventListener("click", closeModal);
     dom.modalOverlay.addEventListener("click", (e) => {
       if (e.target === dom.modalOverlay) closeModal();
@@ -1020,6 +1075,52 @@
           dom.deleteAllBtn.disabled = false;
         }, 1500);
       }
+    });
+
+    // Export All Cookies as CSV
+    dom.exportCsvBtn.addEventListener("click", () => {
+      const cookies = Array.from(state.cookies.values());
+      if (cookies.length === 0) return;
+
+      dom.exportCsvBtn.disabled = true;
+
+      const columns = ["name", "value", "domain", "path", "size", "secure", "httpOnly", "sameSite", "session", "expirationDate", "vendor"];
+
+      function csvEscape(val) {
+        const str = val == null ? "" : String(val);
+        if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+          return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+      }
+
+      const rows = [columns.join(",")];
+      for (const c of cookies) {
+        const vendor = identifyVendor(c.name, c.domain) || "";
+        const row = [
+          c.name, c.value, c.domain, c.path, c.size,
+          c.secure, c.httpOnly, c.sameSite, c.session,
+          c.expirationDate || "", vendor,
+        ].map(csvEscape);
+        rows.push(row.join(","));
+      }
+
+      const csv = rows.join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cookies-${state.sourceHost || "export"}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      dom.exportCsvBtn.textContent = "Exported!";
+      setTimeout(() => {
+        dom.exportCsvBtn.textContent = "Export All";
+        dom.exportCsvBtn.disabled = false;
+      }, 1500);
     });
   }
 
@@ -1149,6 +1250,41 @@
     __cf_bm: "Cloudflare Bot Management",
     datadome: "DataDome",
     reese84: "Shape Security",
+    // A/B Testing & Feature Flags (expanded)
+    _conv_v: "Convert", _conv_s: "Convert", _conv_r: "Convert",
+    _ubpv: "Unbounce", ubvs: "Unbounce", ubvt: "Unbounce",
+    _gb_uid: "GrowthBook",
+    statsig_user_id: "Statsig", statsig_stable_id: "Statsig",
+    optimizelyDomainTestCookie: "Optimizely", optimizelyOptOut: "Optimizely",
+    _harness_cf: "Harness",
+    // Session Replay & Heatmaps
+    _ce_s: "Crazy Egg", _ce_clock_data: "Crazy Egg", is_returning: "Crazy Egg",
+    __insp_wid: "Inspectlet", __insp_uid: "Inspectlet", __insp_nv: "Inspectlet",
+    _lo_uid: "Lucky Orange", _lo_v: "Lucky Orange",
+    // Analytics (expanded)
+    _cb: "Chartbeat", _chartbeat2: "Chartbeat", _chartbeat4: "Chartbeat",
+    _ym_uid: "Yandex Metrica", _ym_d: "Yandex Metrica", _ym_isad: "Yandex Metrica",
+    BAIDUID: "Baidu Analytics", BIDUPSID: "Baidu Analytics",
+    WT_FPC: "Webtrends",
+    _mapp_: "Mapp Intelligence",
+    _qualtrics: "Qualtrics", QSI_HistorySession: "Qualtrics",
+    // Video
+    _wistia_uid: "Wistia",
+    vuid: "Vimeo",
+    // Onboarding
+    _apcues_usr: "Appcues",
+    // Email / Marketing
+    _sib_: "Brevo",
+    _acq_: "ActiveCampaign",
+    // Fraud Prevention
+    ftr_blst: "Forter", ftr_ncd: "Forter",
+    // Live Chat
+    __tawkuuid: "Tawk.to", TawkConnectionTime: "Tawk.to",
+    hblid: "Olark", olfsk: "Olark", wcsid: "Olark",
+    ssupp_vid: "Smartsupp",
+    // Surveys
+    _svt_tid: "Survicate",
+    _tf_: "Typeform",
   };
 
   const vendorPrefixes = [
@@ -1262,6 +1398,38 @@
     ["_ueq_", "Userpilot"],
     ["pendo_", "Pendo"],
     ["_gainsight_", "Gainsight"],
+    // A/B Testing & Feature Flags (expanded)
+    ["_conv_", "Convert"],
+    ["ubvs", "Unbounce"], ["ubvt", "Unbounce"], ["_ubpv", "Unbounce"],
+    ["_gb_", "GrowthBook"],
+    ["statsig_", "Statsig"],
+    ["_harness_", "Harness"],
+    // Session Replay & Heatmaps (expanded)
+    ["_ce_", "Crazy Egg"],
+    ["__insp_", "Inspectlet"],
+    ["_lo_", "Lucky Orange"],
+    ["smartlook_", "Smartlook"],
+    // Analytics (expanded)
+    ["_chartbeat", "Chartbeat"], ["_cb_", "Chartbeat"],
+    ["_ym_", "Yandex Metrica"],
+    ["_mapp_", "Mapp Intelligence"],
+    ["_ph_", "PostHog"], ["ph_", "PostHog"],
+    ["_sp_", "Snowplow"], ["sp_", "Snowplow"],
+    // Video
+    ["_wistia_", "Wistia"],
+    // Onboarding
+    ["_apcues_", "Appcues"], ["apcues_", "Appcues"],
+    // Email / Marketing
+    ["_sib_", "Brevo"], ["sib_", "Brevo"],
+    ["_acq_", "ActiveCampaign"],
+    // Fraud Prevention
+    ["ftr_", "Forter"],
+    // Live Chat
+    ["__tawk", "Tawk.to"],
+    ["ssupp_", "Smartsupp"],
+    // Surveys
+    ["_svt_", "Survicate"], ["svt_", "Survicate"],
+    ["_tf_", "Typeform"],
   ];
 
   const vendorDomains = {
@@ -1359,6 +1527,45 @@
     "livechatinc.com": "LiveChat",
     "freshworks.com": "Freshworks",
     "zendesk.com": "Zendesk",
+    // A/B Testing & Feature Flags (expanded)
+    "convert.com": "Convert",
+    "unbounce.com": "Unbounce",
+    "growthbook.io": "GrowthBook",
+    "statsig.com": "Statsig",
+    "launchdarkly.com": "LaunchDarkly",
+    "split.io": "Split.io",
+    "harness.io": "Harness",
+    // Session Replay & Heatmaps (expanded)
+    "crazyegg.com": "Crazy Egg",
+    "inspectlet.com": "Inspectlet",
+    "luckyorange.com": "Lucky Orange",
+    "smartlook.com": "Smartlook",
+    // Analytics (expanded)
+    "chartbeat.com": "Chartbeat", "chartbeat.net": "Chartbeat",
+    "mc.yandex.ru": "Yandex Metrica", "yandex.ru": "Yandex Metrica",
+    "hm.baidu.com": "Baidu Analytics",
+    "webtrends.com": "Webtrends",
+    "mapp.com": "Mapp Intelligence",
+    "qualtrics.com": "Qualtrics",
+    "posthog.com": "PostHog",
+    "snowplow.io": "Snowplow", "snowplowanalytics.com": "Snowplow",
+    // Video
+    "wistia.com": "Wistia", "wistia.net": "Wistia",
+    "vimeo.com": "Vimeo",
+    // Onboarding
+    "appcues.com": "Appcues",
+    // Email / Marketing
+    "brevo.com": "Brevo", "sendinblue.com": "Brevo",
+    "activecampaign.com": "ActiveCampaign",
+    // Fraud Prevention
+    "forter.com": "Forter",
+    // Live Chat (expanded)
+    "tawk.to": "Tawk.to",
+    "olark.com": "Olark",
+    "smartsupp.com": "Smartsupp",
+    // Surveys
+    "survicate.com": "Survicate",
+    "typeform.com": "Typeform",
   };
 
   function identifyVendor(cookieName, domain) {
