@@ -8,13 +8,13 @@ Cookie Cockpit gives you complete visibility and control over the cookies on any
 ## Key Features
 
 • **Intuitive Dashboard** <br>
-View all cookies for the current site in a clean list view and advanced detail view. Filter, sort, and search cookies by domain, name, or value.
+View all cookies for the current site in a clean list view and advanced detail view. Filter, sort, and search cookies by domain, name, value, or vendor.
 
 • **Real-Time Monitoring** <br>
 Watch cookies change in real time. Cookie Cockpit listens to cookie changes and highlights new, modified, and deleted cookies as they happen — no manual refresh needed.
 
 • **Vendor Identification** <br>
-Recognizes and filters cookies from known vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
+Recognize and filter cookies from known vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
 
 • **Creation, Editing, Deletion, Export** <br>
 Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately. Create new cookies from scratch with custom attributes. Delete individual cookies or clear all cookies for a domain with one click. Export all cookies and details via CSV.
