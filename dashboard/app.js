@@ -45,6 +45,7 @@
     modalContent: $("#modalContent"),
     modalClose: $("#modalClose"),
     deleteAllBtn: $("#deleteAllBtn"),
+    deleteFilteredBtn: $("#deleteFilteredBtn"),
     createCookieBtn: $("#createCookieBtn"),
     exportCsvBtn: $("#exportCsvBtn"),
     particles: $("#particles"),
@@ -321,6 +322,13 @@
   function renderCookies() {
     const filtered = getFilteredCookies();
 
+    // Toggle Delete Filtered button active state
+    const isFiltering =
+      state.filter !== "all" ||
+      state.search !== "" ||
+      state.vendorFilter !== "all";
+    dom.deleteFilteredBtn.classList.toggle("active", isFiltering);
+
     if (filtered.length === 0) {
       dom.cookieGrid.innerHTML = "";
       const empty = document.createElement("div");
@@ -506,19 +514,64 @@
   }
 
   // ===== Live Feed =====
+  function cookieMatchesFilters(c) {
+    switch (state.filter) {
+      case "firstParty":
+        if (!isFirstParty(c)) return false;
+        break;
+      case "thirdParty":
+        if (isFirstParty(c)) return false;
+        break;
+      case "secure":
+        if (!c.secure) return false;
+        break;
+      case "httpOnly":
+        if (!c.httpOnly) return false;
+        break;
+      case "session":
+        if (!c.session) return false;
+        break;
+      case "persistent":
+        if (c.session) return false;
+        break;
+      case "large":
+        if (c.size <= 100) return false;
+        break;
+    }
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      const vendor = identifyVendor(c.name, c.domain);
+      if (
+        !c.name.toLowerCase().includes(q) &&
+        !c.domain.toLowerCase().includes(q) &&
+        !(c.value && c.value.toLowerCase().includes(q)) &&
+        !(vendor && vendor.toLowerCase().includes(q))
+      )
+        return false;
+    }
+    if (state.vendorFilter !== "all") {
+      const vendor = identifyVendor(c.name, c.domain);
+      if (state.vendorFilter === "unknown") {
+        if (vendor) return false;
+      } else if (vendor !== state.vendorFilter) return false;
+    }
+    return true;
+  }
+
   function addFeedItem(action, cookie, cause) {
     const item = { action, cookie, cause, time: Date.now() };
     state.feedItems.unshift(item);
     if (state.feedItems.length > 100) state.feedItems.pop();
-    renderFeedItem(item);
+    renderFeedItem(item, true);
   }
 
-  function renderFeedItem(item) {
+  function renderFeedItem(item, prepend) {
     const empty = dom.feedList.querySelector(".feed-empty");
     if (empty) empty.remove();
 
     const el = document.createElement("div");
     el.className = `feed-item ${item.action}`;
+    if (!cookieMatchesFilters(item.cookie)) el.classList.add("feed-hidden");
 
     const labels = { added: "Added", removed: "Removed", changed: "Changed", overwrite: "Updated" };
 
@@ -531,8 +584,22 @@
       <div class="feed-item-domain">${esc(item.cookie.domain)}</div>
     `;
 
-    dom.feedList.prepend(el);
+    if (prepend) dom.feedList.prepend(el);
+    else dom.feedList.appendChild(el);
     while (dom.feedList.children.length > 80) dom.feedList.lastChild.remove();
+  }
+
+  function renderFeed() {
+    dom.feedList.innerHTML = "";
+    for (const item of state.feedItems) {
+      renderFeedItem(item, false);
+    }
+    if (dom.feedList.children.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "feed-empty";
+      empty.textContent = "Waiting for cookie changes...";
+      dom.feedList.appendChild(empty);
+    }
   }
 
   // ===== Modal (editable properties) =====
@@ -991,6 +1058,7 @@
         state.search = e.target.value.trim();
         renderFloatingCookies();
         renderCookies();
+        renderFeed();
       }, 200);
     });
 
@@ -1001,6 +1069,7 @@
         state.filter = chip.dataset.filter;
         renderFloatingCookies();
         renderCookies();
+        renderFeed();
       });
     }
 
@@ -1014,6 +1083,7 @@
       state.vendorFilter = e.target.value;
       renderFloatingCookies();
       renderCookies();
+      renderFeed();
     });
 
     dom.modalClose.addEventListener("click", closeModal);
@@ -1026,6 +1096,62 @@
 
     // Create Cookie
     dom.createCookieBtn.addEventListener("click", () => openCreateModal());
+
+    // Delete Filtered Cookies
+    dom.deleteFilteredBtn.addEventListener("click", () => {
+      const isFiltering =
+        state.filter !== "all" ||
+        state.search !== "" ||
+        state.vendorFilter !== "all";
+      if (!isFiltering) return;
+
+      const cookies = getFilteredCookies();
+      if (cookies.length === 0) return;
+      if (!confirm(`Delete ${cookies.length} filtered cookies?`)) return;
+
+      dom.deleteFilteredBtn.textContent = "Deleting...";
+      dom.deleteFilteredBtn.disabled = true;
+
+      let settled = false;
+      const cleanup = () => {
+        settled = true;
+        clearTimeout(tid);
+        state.port.onMessage.removeListener(onResult);
+      };
+
+      const onResult = (msg) => {
+        if (msg.type !== "remove-all-cookies-result" || settled) return;
+        cleanup();
+        if (msg.success) {
+          dom.deleteFilteredBtn.textContent = `Deleted ${msg.removed} cookies!`;
+        } else {
+          dom.deleteFilteredBtn.textContent = `Deleted ${msg.removed}, ${msg.failed} failed`;
+        }
+        setTimeout(() => {
+          dom.deleteFilteredBtn.textContent = "Delete Filtered";
+          dom.deleteFilteredBtn.disabled = false;
+        }, 2000);
+      };
+
+      const tid = setTimeout(() => {
+        if (settled) return;
+        cleanup();
+        dom.deleteFilteredBtn.textContent = "Delete Filtered";
+        dom.deleteFilteredBtn.disabled = false;
+      }, 15000);
+
+      state.port.onMessage.addListener(onResult);
+      try {
+        state.port.postMessage({ type: "remove-all-cookies", cookies });
+      } catch {
+        cleanup();
+        dom.deleteFilteredBtn.textContent = "Failed";
+        setTimeout(() => {
+          dom.deleteFilteredBtn.textContent = "Delete Filtered";
+          dom.deleteFilteredBtn.disabled = false;
+        }, 1500);
+      }
+    });
 
     // Delete All Cookies
     dom.deleteAllBtn.addEventListener("click", () => {

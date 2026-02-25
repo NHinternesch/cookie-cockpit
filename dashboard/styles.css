@@ -898,6 +898,7 @@ body {
 }
 
 .feed-item:last-child { border-bottom: none; }
+.feed-item.feed-hidden { display: none; }
 
 .feed-item.added .feed-item-action { color: var(--green); }
 .feed-item.removed .feed-item-action { color: var(--red); }
@@ -1194,6 +1195,7 @@ body {
   cursor: default;
 }
 
+.delete-filtered-btn,
 .delete-all-btn {
   display: inline-flex;
   align-items: center;
@@ -1210,15 +1212,33 @@ body {
   transition: all 0.25s ease;
 }
 
+.delete-filtered-btn {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.delete-filtered-btn.active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.delete-filtered-btn:hover,
 .delete-all-btn:hover {
   opacity: 0.9;
   transform: translateY(-1px);
 }
 
+.delete-filtered-btn:not(.active):hover {
+  opacity: 0.45;
+  transform: none;
+}
+
+.delete-filtered-btn:active,
 .delete-all-btn:active {
   transform: translateY(0);
 }
 
+.delete-filtered-btn:disabled,
 .delete-all-btn:disabled {
   opacity: 0.6;
   cursor: default;
