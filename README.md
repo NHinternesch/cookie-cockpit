@@ -14,13 +14,13 @@ View all cookies for the current site in a clean list view and advanced detail v
 Watch cookies change in real time. Cookie Cockpit listens to cookie changes and highlights new, modified, and deleted cookies as they happen — no manual refresh needed.
 
 • **Vendor Identification** <br>
-Recognize and filter cookies from known vendors, ad networks, analytics providers, and other third-party services, helping you understand who is setting cookies and why.
+Recognize and filter cookies from known vendors, ad networks, analytics providers, and other third-parties - helping you understand who is setting cookies and why.
 
 • **Creation, Editing, Deletion, Export** <br>
-Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately. Create new cookies from scratch with custom attributes. Delete individual cookies or clear all cookies for a domain with one click. Export all cookies and details via CSV.
+Edit any cookie value, expiration, domain, path, or flags directly from the dashboard. Changes take effect immediately. Create new cookies with custom attributes. Delete individual cookies or clear all cookies with one click. Export cookie details via CSV.
 
 • **Security** <br>
-Browsing data stays on your machine. Local processing only. No data is collected, stored, or sent to any external server. No analytics, no tracking, and no third-party services.
+Local processing only. No data is collected, stored, or sent to any external server. No analytics, no tracking, and no third-party services.
 
 • **Free and open-source** <br>
 Always free to use, MIT License, source code is fully available on Github.
