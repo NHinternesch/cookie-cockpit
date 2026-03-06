@@ -10,8 +10,8 @@ Cookie Cockpit gives you complete visibility and control over the cookies on any
 • **Intuitive Dashboard** <br>
 View all cookies for the current site in a clean list view and advanced detail view. Filter, sort, and search cookies by domain, name, value, or vendor.
 
-• **Real-Time Monitoring** <br>
-Watch cookies change in real time. Cookie Cockpit listens to cookie changes and highlights new, modified, and deleted cookies as they happen — no manual refresh needed.
+• **Real-Time Monitoring, Local Storage Mapping** <br>
+Listen to cookie changes in real-time and highlight new, modified, and deleted cookies as they happen. Map cookie values against local storage to identify vendors matching IDs across browser device storage methods.
 
 • **Vendor Identification** <br>
 Recognize and filter cookies from known vendors, ad networks, analytics providers, and other third-parties - helping you understand who is setting cookies and why.
