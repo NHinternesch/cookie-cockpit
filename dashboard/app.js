@@ -14,6 +14,7 @@
     vendorFilter: "all",
     feedItems: [],
     openModalCookieKey: null,
+    localStorageItems: {},
   };
 
   // ===== DOM =====
@@ -49,6 +50,8 @@
     createCookieBtn: $("#createCookieBtn"),
     exportCsvBtn: $("#exportCsvBtn"),
     particles: $("#particles"),
+    localStorageCard: $("#localStorageCard"),
+    localStorageMatchCount: $("#localStorageMatchCount"),
   };
 
   // ===== Init =====
@@ -78,15 +81,18 @@
   }
 
   // ===== Background Connection =====
-  function setupConnection() {
-    state.port = chrome.runtime.connect({ name: "cookie-cockpit-dashboard" });
+  function connectPort() {
+    const port = chrome.runtime.connect({ name: "cookie-cockpit-dashboard" });
 
-    state.port.onMessage.addListener((msg) => {
+    port.onMessage.addListener((msg) => {
       switch (msg.type) {
         case "cookies":
           if (msg.screenshot) {
             dom.siteScreenshot.src = msg.screenshot;
             dom.screenshotPlaceholder.classList.add("hidden");
+          }
+          if (msg.localStorageItems) {
+            state.localStorageItems = msg.localStorageItems;
           }
           handleInitialCookies(msg.cookies);
           break;
@@ -95,6 +101,23 @@
           break;
       }
     });
+
+    port.onDisconnect.addListener(() => {
+      // Service worker went idle — reconnect so future operations work
+      state.port = connectPort();
+      // Re-register with the background so cookie-changed events keep flowing
+      state.port.postMessage({
+        type: "get-cookies",
+        url: state.sourceUrl,
+        tabId: state.sourceTabId,
+      });
+    });
+
+    return port;
+  }
+
+  function setupConnection() {
+    state.port = connectPort();
 
     state.port.postMessage({
       type: "get-cookies",
@@ -115,6 +138,18 @@
       ? cookie.domain.slice(1)
       : cookie.domain;
     return state.sourceHost === d || state.sourceHost.endsWith("." + d);
+  }
+
+  // Check if a cookie value also exists in localStorage (min 8 chars to avoid false positives)
+  function findLocalStorageMatches(cookie) {
+    const matches = [];
+    if (!cookie.value || cookie.value.length < 8) return matches;
+    for (const [key, val] of Object.entries(state.localStorageItems)) {
+      if (val && val.includes(cookie.value)) {
+        matches.push(key);
+      }
+    }
+    return matches;
   }
 
   function handleInitialCookies(cookies) {
@@ -214,6 +249,15 @@
     animateStat(dom.sessionCount, sess);
     const persPct = total > 0 ? (pers / total) * 100 : 0;
     dom.typeCard.style.background = `linear-gradient(to right, rgba(124,58,237,0.10) ${persPct}%, rgba(184,134,11,0.10) ${persPct}%)`;
+
+    // Local Storage matches
+    const lsMatchCount = cookies.filter((c) => findLocalStorageMatches(c).length > 0).length;
+    if (lsMatchCount > 0) {
+      dom.localStorageCard.style.display = "";
+      animateStat(dom.localStorageMatchCount, lsMatchCount);
+    } else {
+      dom.localStorageCard.style.display = "none";
+    }
   }
 
   function animateStat(el, val) {
@@ -411,6 +455,7 @@
     if (!/\b(session|persistent)\b/.test(card.className)) card.classList.add(typeClass);
 
     const vendor = identifyVendor(cookie.name, cookie.domain);
+    const lsMatches = findLocalStorageMatches(cookie);
 
     card.innerHTML = `
       <div class="cookie-card-header">
@@ -421,6 +466,7 @@
       <div class="cookie-value-preview">${esc(truncate(cookie.value, 60)) || '<em style="opacity:0.4">empty</em>'}</div>
       <div class="cookie-badges">
         ${vendor ? `<span class="badge vendor-badge">${esc(vendor)}</span>` : ""}
+        ${lsMatches.length > 0 ? `<span class="badge badge-localstorage">Found in Local Storage</span>` : ""}
       </div>
       ${!cookie.session && cookie.expirationDate ? `<div class="cookie-expiry">Expires in ${formatDate(cookie.expirationDate)}</div>` : ""}
     `;
@@ -465,6 +511,9 @@
         break;
       case "large":
         cookies = cookies.filter((c) => c.size > 100);
+        break;
+      case "localStorage":
+        cookies = cookies.filter((c) => findLocalStorageMatches(c).length > 0);
         break;
     }
 
@@ -536,6 +585,9 @@
         break;
       case "large":
         if (c.size <= 100) return false;
+        break;
+      case "localStorage":
+        if (findLocalStorageMatches(c).length === 0) return false;
         break;
     }
     if (state.search) {
@@ -617,6 +669,8 @@
       expiresValue = toDatetimeLocal(d);
     }
 
+    const lsMatches = findLocalStorageMatches(cookie);
+
     dom.modalContent.innerHTML = `
       <h2>${esc(cookie.name)}</h2>
       <div class="modal-domain">${esc(cookie.domain)}${esc(cookie.path)}</div>
@@ -679,6 +733,22 @@
           </div>
         </div>
       </div>
+      ${lsMatches.length > 0 ? `
+      <div class="modal-localstorage">
+        <div class="modal-localstorage-title">Found in Local Storage</div>
+        ${lsMatches.map((key, i) => `
+          <div class="modal-localstorage-item">
+            <div class="modal-localstorage-label">Key</div>
+            <div class="modal-localstorage-key">${esc(key)}</div>
+            <div class="modal-localstorage-label">Value</div>
+            <div class="modal-localstorage-val">${esc(truncate(state.localStorageItems[key] || "", 200))}</div>
+            <div class="modal-localstorage-actions">
+              <button class="ls-delete-btn" data-ls-index="${i}">Delete from Local Storage</button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+      ` : ""}
     `;
 
     dom.modalOverlay.classList.add("open");
@@ -692,6 +762,51 @@
     const sameSiteSelect = dom.modalContent.querySelector("#modalSameSite");
     const expiresInput = dom.modalContent.querySelector("#modalExpires");
     const sessionBtn = dom.modalContent.querySelector("#modalSessionBtn");
+
+    // Local Storage delete buttons
+    for (const btn of dom.modalContent.querySelectorAll(".ls-delete-btn")) {
+      btn.addEventListener("click", () => {
+        const lsKey = lsMatches[parseInt(btn.dataset.lsIndex, 10)];
+        btn.textContent = "Deleting...";
+        btn.disabled = true;
+
+        let settled = false;
+        const cleanup = () => {
+          settled = true;
+          clearTimeout(tid);
+          state.port.onMessage.removeListener(onResult);
+        };
+
+        const onResult = (msg) => {
+          if (msg.type !== "delete-localstorage-result" || msg.key !== lsKey || settled) return;
+          cleanup();
+          if (msg.success) {
+            delete state.localStorageItems[lsKey];
+            btn.textContent = "Deleted!";
+            setTimeout(() => { renderAll(); openModal(state.cookies.get(cookieKey(cookie))); }, 800);
+          } else {
+            btn.textContent = "Failed";
+            setTimeout(() => { btn.textContent = "Delete from Local Storage"; btn.disabled = false; }, 1500);
+          }
+        };
+
+        const tid = setTimeout(() => {
+          if (settled) return;
+          cleanup();
+          btn.textContent = "Failed";
+          setTimeout(() => { btn.textContent = "Delete from Local Storage"; btn.disabled = false; }, 1500);
+        }, 5000);
+
+        state.port.onMessage.addListener(onResult);
+        try {
+          state.port.postMessage({ type: "delete-localstorage", tabId: state.sourceTabId, key: lsKey });
+        } catch {
+          cleanup();
+          btn.textContent = "Failed";
+          setTimeout(() => { btn.textContent = "Delete from Local Storage"; btn.disabled = false; }, 1500);
+        }
+      });
+    }
 
     let isSession = cookie.session;
 
@@ -1067,11 +1182,23 @@
         $$(".chip").forEach((c) => c.classList.remove("active"));
         chip.classList.add("active");
         state.filter = chip.dataset.filter;
+        dom.localStorageCard.classList.remove("active");
         renderFloatingCookies();
         renderCookies();
         renderFeed();
       });
     }
+
+    // Click localStorage KPI to toggle filter
+    dom.localStorageCard.addEventListener("click", () => {
+      const isActive = state.filter === "localStorage";
+      state.filter = isActive ? "all" : "localStorage";
+      dom.localStorageCard.classList.toggle("active", !isActive);
+      $$(".chip").forEach((c) => c.classList.toggle("active", isActive && c.dataset.filter === "all"));
+      renderFloatingCookies();
+      renderCookies();
+      renderFeed();
+    });
 
     dom.sortSelect.addEventListener("change", (e) => {
       state.sort = e.target.value;
@@ -1411,6 +1538,48 @@
     // Surveys
     _svt_tid: "Survicate",
     _tf_: "Typeform",
+    // Salesforce Commerce Cloud (Demandware)
+    dwsid: "Salesforce Commerce Cloud", cqcid: "Salesforce Commerce Cloud",
+    cquid: "Salesforce Commerce Cloud", __cq_dnt: "Salesforce Commerce Cloud",
+    dw_dnt: "Salesforce Commerce Cloud",
+    // Salesforce (general)
+    BrowserId: "Salesforce", CookieConsentPolicy: "Salesforce",
+    LSKey: "Salesforce",
+    // SAP Commerce (Hybris)
+    acceleratorSecureGUID: "SAP Commerce",
+    // CMS
+    "Drupal.visitor.cookie": "Drupal",
+    SC_ANALYTICS_GLOBAL_COOKIE: "Sitecore", SC_ANALYTICS_SESSION_COOKIE: "Sitecore",
+    // Monitoring / APM
+    NREUM: "New Relic", NRAGENT: "New Relic",
+    // CAPTCHA
+    _GRECAPTCHA: "Google reCAPTCHA",
+    // Consent Management (expanded)
+    "cookieyes-consent": "CookieYes", cky_consent: "CookieYes",
+    CookieControl: "CIVIC",
+    tarteaucitron: "tarteaucitron",
+    moove_gdpr_popup: "Moove GDPR",
+    cookie_notice_accepted: "Cookie Notice",
+    // Analytics (expanded)
+    _paq: "Matomo",
+    // Pendo
+    _pendo_visitorId: "Pendo", _pendo_accountId: "Pendo", _pendo_meta: "Pendo",
+    // Google Consent Mode
+    _gac_gb: "Google Consent Mode",
+    // Userpilot
+    userpilot_id: "Userpilot",
+    // Microsoft
+    MC1: "Microsoft", MS0: "Microsoft",
+    // Amazon
+    "session-id": "Amazon", "i18n-prefs": "Amazon",
+    // Evidon
+    _evidon_consent_cookie: "Crownpeak",
+    // Eppo
+    eppo_session: "Eppo",
+    // ContentKing
+    _ck_visitor: "ContentKing",
+    // Cxense / Piano Content
+    cX_P: "Cxense", cX_S: "Cxense", cX_G: "Cxense",
   };
 
   const vendorPrefixes = [
@@ -1556,6 +1725,35 @@
     // Surveys
     ["_svt_", "Survicate"], ["svt_", "Survicate"],
     ["_tf_", "Typeform"],
+    // Salesforce Commerce Cloud (Demandware)
+    ["dwac_", "Salesforce Commerce Cloud"], ["dwanonymous_", "Salesforce Commerce Cloud"],
+    ["dwsecuretoken_", "Salesforce Commerce Cloud"], ["dw_", "Salesforce Commerce Cloud"],
+    // Salesforce (general)
+    ["sfdc-", "Salesforce"], ["_sfmc_", "Salesforce Marketing Cloud"],
+    // SAP Commerce
+    ["sap-", "SAP Commerce"],
+    // Sitecore
+    ["SC_ANALYTICS_", "Sitecore"],
+    // New Relic
+    ["NRBA_", "New Relic"], ["newrelic", "New Relic"],
+    // Consent Management (expanded)
+    ["cookieyes", "CookieYes"], ["cky_", "CookieYes"],
+    ["tarteaucitron", "tarteaucitron"],
+    ["moove_gdpr_", "Moove GDPR"],
+    // Pendo
+    ["pendo_", "Pendo"], ["_pendo_", "Pendo"],
+    // Userpilot
+    ["userpilot_", "Userpilot"],
+    // Shopware
+    ["sw-", "Shopware"], ["session-", "Shopware"],
+    // Drupal
+    ["SESS", "Drupal"], ["SSESS", "Drupal"],
+    // Cxense / Piano Content
+    ["cX_", "Cxense"], ["cx_", "Cxense"],
+    // Eppo
+    ["eppo_", "Eppo"],
+    // Google Consent Mode
+    ["_gac_gb", "Google Consent Mode"],
   ];
 
   const vendorDomains = {
@@ -1692,6 +1890,43 @@
     // Surveys
     "survicate.com": "Survicate",
     "typeform.com": "Typeform",
+    // Salesforce Commerce Cloud (Demandware)
+    "demandware.net": "Salesforce Commerce Cloud",
+    "demandware.com": "Salesforce Commerce Cloud",
+    "commercecloud.salesforce.com": "Salesforce Commerce Cloud",
+    // Salesforce (general)
+    "salesforce.com": "Salesforce",
+    "force.com": "Salesforce",
+    "exacttarget.com": "Salesforce Marketing Cloud",
+    // SAP Commerce
+    "sap.com": "SAP Commerce",
+    "hybris.com": "SAP Commerce",
+    // Sitecore
+    "sitecore.net": "Sitecore",
+    // New Relic
+    "newrelic.com": "New Relic",
+    "nr-data.net": "New Relic",
+    // Matomo
+    "matomo.cloud": "Matomo",
+    // Pendo
+    "pendo.io": "Pendo",
+    // Userpilot
+    "userpilot.io": "Userpilot",
+    // Shopware
+    "shopware.com": "Shopware",
+    // Amazon (ads/affiliate)
+    "amazon-adsystem.com": "Amazon",
+    // CookieYes
+    "cookieyes.com": "CookieYes",
+    // Cxense / Piano Content
+    "cxense.com": "Cxense",
+    // Plausible / Fathom / Simple Analytics (privacy-focused)
+    "plausible.io": "Plausible Analytics",
+    "usefathom.com": "Fathom Analytics",
+    // Eppo
+    "geteppo.com": "Eppo",
+    // ContentKing
+    "contentkingapp.com": "ContentKing",
   };
 
   function identifyVendor(cookieName, domain) {

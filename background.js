@@ -43,7 +43,19 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
   } catch {}
 
-  await setScan(tab.id, { url: tab.url, domains, screenshot });
+  // Collect localStorage entries from the main frame
+  let localStorageItems = {};
+  try {
+    const lsResults = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: collectLocalStorage,
+    });
+    if (lsResults?.[0]?.result) {
+      localStorageItems = lsResults[0].result;
+    }
+  } catch {}
+
+  await setScan(tab.id, { url: tab.url, domains, screenshot, localStorageItems });
 
   const dashboardUrl = chrome.runtime.getURL(
     `dashboard/index.html?url=${encodeURIComponent(tab.url)}&tabId=${tab.id}&title=${encodeURIComponent(tab.title || "")}`
@@ -73,6 +85,17 @@ function collectPageDomains() {
     }
   }
   return [...domains];
+}
+
+function collectLocalStorage() {
+  const items = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      items[key] = localStorage.getItem(key);
+    }
+  } catch {}
+  return items;
 }
 
 // --- Dashboard connections ---
@@ -165,12 +188,28 @@ chrome.runtime.onConnect.addListener((port) => {
       } catch {}
       return;
     }
+    if (msg.type === "delete-localstorage") {
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: msg.tabId },
+          func: (key) => { localStorage.removeItem(key); },
+          args: [msg.key],
+        });
+        port.postMessage({ type: "delete-localstorage-result", success: true, key: msg.key });
+      } catch (err) {
+        try {
+          port.postMessage({ type: "delete-localstorage-result", success: false, key: msg.key, error: String(err?.message || err) });
+        } catch {}
+      }
+      return;
+    }
     if (msg.type === "get-cookies") {
       const tabId = msg.tabId;
       const scan = await getScan(tabId);
       const sourceUrl = msg.url || scan?.url || "";
       const pageDomains = scan?.domains || [];
       const screenshot = scan?.screenshot || null;
+      const localStorageItems = scan?.localStorageItems || {};
 
       let sourceHost = "";
       try {
@@ -184,7 +223,7 @@ chrome.runtime.onConnect.addListener((port) => {
 
       fetchCookiesForDomains(sourceUrl, sourceHost, relevantDomains).then(
         (cookies) => {
-          port.postMessage({ type: "cookies", cookies, screenshot });
+          port.postMessage({ type: "cookies", cookies, screenshot, localStorageItems });
         }
       );
     }

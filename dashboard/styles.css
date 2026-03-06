@@ -183,10 +183,20 @@ body {
 
 /* ===== Stats Bar ===== */
 .stats-bar {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 12px;
   margin-bottom: 20px;
+}
+.stats-bar > .stat-card:not(.stat-card-localstorage) {
+  flex: 1;
+}
+.stats-bar > .stat-card-localstorage {
+  flex: 0 0 auto;
+  min-width: 120px;
+  margin-left: 4px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
 }
 
 .stat-card {
@@ -248,6 +258,109 @@ body {
 
 .stat-split-half {
   flex: 1;
+}
+
+/* ===== Local Storage Stat Card ===== */
+.stat-card-localstorage {
+  background: rgba(234, 88, 12, 0.06);
+  border-color: rgba(234, 88, 12, 0.22);
+}
+.stat-card-localstorage:hover {
+  border-color: rgba(234, 88, 12, 0.45);
+  transform: translateY(-2px);
+}
+.stat-card-localstorage.active {
+  border-color: rgba(234, 88, 12, 0.6);
+  background: rgba(234, 88, 12, 0.12);
+}
+.stat-card-localstorage .stat-value {
+  color: #c2410c;
+}
+.stat-card-localstorage .stat-label {
+  color: #c2410c;
+}
+
+/* ===== Local Storage Badge (cookie cards) ===== */
+.badge-localstorage {
+  background: rgba(234, 88, 12, 0.10);
+  color: #c2410c;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+/* ===== Local Storage Section (modal) ===== */
+.modal-localstorage {
+  background: rgba(234, 88, 12, 0.04);
+  border: 1px solid rgba(234, 88, 12, 0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 12px;
+}
+.modal-localstorage-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #c2410c;
+  margin-bottom: 8px;
+}
+.modal-localstorage-item {
+  margin-bottom: 10px;
+}
+.modal-localstorage-item:last-child {
+  margin-bottom: 0;
+}
+.modal-localstorage-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+.modal-localstorage-key {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  word-break: break-all;
+  margin-bottom: 4px;
+  padding: 4px 6px;
+  background: rgba(234, 88, 12, 0.05);
+  border-radius: 4px;
+}
+.modal-localstorage-val {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  word-break: break-all;
+  padding: 4px 6px;
+  background: rgba(234, 88, 12, 0.03);
+  border-radius: 4px;
+  max-height: 60px;
+  overflow: auto;
+}
+.modal-localstorage-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ls-delete-btn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(234, 88, 12, 0.25);
+  background: rgba(234, 88, 12, 0.06);
+  color: #c2410c;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ls-delete-btn:hover {
+  background: rgba(234, 88, 12, 0.15);
+  border-color: rgba(234, 88, 12, 0.45);
 }
 
 /* ===== Controls ===== */
@@ -1418,7 +1531,9 @@ body {
 @media (max-width: 1100px) {
   .overview-section { grid-template-columns: 1fr; }
   .live-feed { position: static; width: auto; max-height: 400px; border-left: none; border-top: 1px solid var(--border); padding: 16px 0 0 0; }
-  .stats-bar { grid-template-columns: repeat(3, 1fr); }
+  .stats-bar { flex-wrap: wrap; }
+  .stats-bar > .stat-card:not(.stat-card-localstorage) { flex: 1 1 30%; }
+  .stats-bar > .stat-card-localstorage { border-left: none; margin-left: 0; padding-left: 0; flex: 1 1 100%; }
 }
 
 /* iMac + list stack vertically */
@@ -1432,7 +1547,9 @@ body {
 /* Small screens */
 @media (max-width: 700px) {
   .app { padding: 16px; }
-  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .stats-bar { flex-wrap: wrap; }
+  .stats-bar > .stat-card:not(.stat-card-localstorage) { flex: 1 1 45%; }
+  .stats-bar > .stat-card-localstorage { border-left: none; margin-left: 0; padding-left: 0; flex: 1 1 100%; }
   .cookie-grid { grid-template-columns: 1fr; }
   .controls { flex-direction: column; align-items: stretch; }
   .filter-chips { overflow-x: auto; }
