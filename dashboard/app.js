@@ -488,55 +488,7 @@
 
   // ===== Filtering & Sorting =====
   function getFilteredCookies() {
-    let cookies = Array.from(state.cookies.values());
-
-    switch (state.filter) {
-      case "firstParty":
-        cookies = cookies.filter((c) => isFirstParty(c));
-        break;
-      case "thirdParty":
-        cookies = cookies.filter((c) => !isFirstParty(c));
-        break;
-      case "secure":
-        cookies = cookies.filter((c) => c.secure);
-        break;
-      case "httpOnly":
-        cookies = cookies.filter((c) => c.httpOnly);
-        break;
-      case "session":
-        cookies = cookies.filter((c) => c.session);
-        break;
-      case "persistent":
-        cookies = cookies.filter((c) => !c.session);
-        break;
-      case "large":
-        cookies = cookies.filter((c) => c.size > 100);
-        break;
-      case "localStorage":
-        cookies = cookies.filter((c) => findLocalStorageMatches(c).length > 0);
-        break;
-    }
-
-    if (state.search) {
-      const q = state.search.toLowerCase();
-      cookies = cookies.filter((c) => {
-        const vendor = identifyVendor(c.name, c.domain);
-        return (
-          c.name.toLowerCase().includes(q) ||
-          c.domain.toLowerCase().includes(q) ||
-          c.value.toLowerCase().includes(q) ||
-          (vendor && vendor.toLowerCase().includes(q))
-        );
-      });
-    }
-
-    if (state.vendorFilter !== "all") {
-      cookies = cookies.filter((c) => {
-        const vendor = identifyVendor(c.name, c.domain);
-        if (state.vendorFilter === "unknown") return !vendor;
-        return vendor === state.vendorFilter;
-      });
-    }
+    let cookies = Array.from(state.cookies.values()).filter(cookieMatchesFilters);
 
     cookies.sort((a, b) => {
       switch (state.sort) {
@@ -1280,7 +1232,7 @@
       }
     });
 
-    // Delete All Cookies
+    // Delete All
     dom.deleteAllBtn.addEventListener("click", () => {
       const cookies = Array.from(state.cookies.values());
       if (cookies.length === 0) return;
@@ -1305,7 +1257,7 @@
           dom.deleteAllBtn.textContent = `Deleted ${msg.removed}, ${msg.failed} failed`;
         }
         setTimeout(() => {
-          dom.deleteAllBtn.textContent = "Delete All Cookies";
+          dom.deleteAllBtn.textContent = "Delete All";
           dom.deleteAllBtn.disabled = false;
         }, 2000);
       };
@@ -1313,7 +1265,7 @@
       const tid = setTimeout(() => {
         if (settled) return;
         cleanup();
-        dom.deleteAllBtn.textContent = "Delete All Cookies";
+        dom.deleteAllBtn.textContent = "Delete All";
         dom.deleteAllBtn.disabled = false;
       }, 15000);
 
@@ -1324,7 +1276,7 @@
         cleanup();
         dom.deleteAllBtn.textContent = "Failed";
         setTimeout(() => {
-          dom.deleteAllBtn.textContent = "Delete All Cookies";
+          dom.deleteAllBtn.textContent = "Delete All";
           dom.deleteAllBtn.disabled = false;
         }, 1500);
       }
@@ -1580,6 +1532,90 @@
     _ck_visitor: "ContentKing",
     // Cxense / Piano Content
     cX_P: "Cxense", cX_S: "Cxense", cX_G: "Cxense",
+    // Hightouch
+    htjs_user_id: "Hightouch", htjs_anonymous_id: "Hightouch",
+    // Heap
+    _hp2_id: "Heap", _hp2_ses_props: "Heap", _hp2_props: "Heap",
+    // OneTrust (expanded)
+    OTGPPConsent: "OneTrust", OptanonActiveGroups: "OneTrust",
+    // Cookiebot (expanded)
+    CookieConsentBulkTicket: "Cookiebot", CookieConsentBulkSetting: "Cookiebot",
+    // Usercentrics
+    uc_settings: "Usercentrics", uc_user_interaction: "Usercentrics",
+    // Sentry
+    _sentry: "Sentry",
+    // Bugsnag
+    bugsnag_anon_id: "Bugsnag",
+    // SpeedCurve
+    _lux_uid: "SpeedCurve LUX",
+    // Coveo
+    coveo_visitorId: "Coveo",
+    // Algolia
+    _algolia: "Algolia",
+    // Bloomreach
+    _br_uid_2: "Bloomreach",
+    // ContentStack
+    _cs_id: "ContentStack",
+    // Kustomer
+    _kuid_: "Kustomer",
+    // Gainsight PX
+    _gs_v_GSN: "Gainsight",
+    // Clearbit
+    _cb_svref: "Clearbit",
+    // Demandbase
+    _db_uid: "Demandbase",
+    // 6sense
+    _6senseCompanyInfo: "6sense",
+    // ZoomInfo
+    _zi_: "ZoomInfo",
+    // Rollbar
+    _rollbar_: "Rollbar",
+    // Chameleon
+    _chmln: "Chameleon",
+    // Customer.io
+    _cio_id: "Customer.io",
+    // Refiner
+    _refiner_session: "Refiner",
+    // Sprig
+    _sprig_uid: "Sprig",
+    // Google Publisher Tag
+    __gpi_optout: "Google Ad Manager",
+    // Bombora
+    _bm_uid: "Bombora",
+    // Heap (expanded)
+    _hp2_hld: "Heap",
+    // Impact.com
+    IRContent: "Impact.com",
+    // Commission Junction
+    cje: "Commission Junction",
+    // ShareASale
+    sas_m: "ShareASale",
+    // Rakuten
+    _rmStore: "Rakuten",
+    // Awin
+    _aw_m_: "Awin",
+    // ClickCease
+    _ccfp: "ClickCease",
+    // WebEngage
+    _we_uid: "WebEngage",
+    // CleverTap
+    WZRK_G: "CleverTap",
+    // MoEngage
+    _moe_uid: "MoEngage",
+    // Insider
+    _ins_: "Insider",
+    // Sailthru
+    sailthru_hid: "Sailthru",
+    // Listrak
+    _ltksid: "Listrak",
+    // Attentive
+    __attentive_id: "Attentive",
+    // Yotpo
+    _yotpo_token: "Yotpo",
+    // Bazaarvoice
+    BVImplmain_site: "Bazaarvoice",
+    // ContentKing (expanded)
+    _ck_session: "ContentKing",
   };
 
   const vendorPrefixes = [
@@ -1652,7 +1688,7 @@
     ["bk_", "Oracle BlueKai"],
     ["kx_", "Krux/Salesforce DMP"],
     ["permutive-", "Permutive"], ["_prmtv_", "Permutive"],
-    ["_lr_", "LiveRamp"], ["rlas", "LiveRamp"],
+    ["rlas", "LiveRamp"],
     // A/B Testing & Personalization
     ["_vis_opt_", "VWO"], ["_vwo_", "VWO"],
     ["optimizelyenduser", "Optimizely"], ["optimizely", "Optimizely"],
@@ -1709,7 +1745,7 @@
     ["_ym_", "Yandex Metrica"],
     ["_mapp_", "Mapp Intelligence"],
     ["_ph_", "PostHog"], ["ph_", "PostHog"],
-    ["_sp_", "Snowplow"], ["sp_", "Snowplow"],
+    ["_sp_", "Snowplow"],
     // Video
     ["_wistia_", "Wistia"],
     // Onboarding
@@ -1754,6 +1790,70 @@
     ["eppo_", "Eppo"],
     // Google Consent Mode
     ["_gac_gb", "Google Consent Mode"],
+    // Hightouch
+    ["htjs_", "Hightouch"], ["_ht_", "Hightouch"],
+    // Bloomreach
+    ["_br_", "Bloomreach"], ["br_", "Bloomreach"],
+    // Demandbase
+    ["_db_", "Demandbase"],
+    // 6sense
+    ["_6sense", "6sense"],
+    // ZoomInfo
+    ["_zi_", "ZoomInfo"],
+    // Chameleon
+    ["_chmln", "Chameleon"], ["chmln_", "Chameleon"],
+    // Customer.io
+    ["_cio", "Customer.io"],
+    // Sprig
+    ["_sprig_", "Sprig"],
+    // Refiner
+    ["_refiner_", "Refiner"],
+    // Clearbit
+    ["_cb_sv", "Clearbit"],
+    // Bombora
+    ["_bm_uid", "Bombora"],
+    // Impact.com
+    ["irclickid", "Impact.com"],
+    // ClickCease
+    ["_ccfp", "ClickCease"],
+    // WebEngage
+    ["_we_", "WebEngage"],
+    // CleverTap
+    ["WZRK_", "CleverTap"],
+    // MoEngage
+    ["_moe_", "MoEngage"],
+    // Insider
+    ["_ins_", "Insider"], ["ins_", "Insider"],
+    // Sailthru
+    ["sailthru_", "Sailthru"],
+    // Listrak
+    ["_ltk", "Listrak"],
+    // Attentive
+    ["__attentive", "Attentive"],
+    // Yotpo
+    ["_yotpo_", "Yotpo"],
+    // Coveo
+    ["coveo_", "Coveo"],
+    // SpeedCurve LUX
+    ["_lux_", "SpeedCurve LUX"],
+    // Sentry
+    ["_sentry", "Sentry"],
+    // Rollbar
+    ["_rollbar", "Rollbar"],
+    // Bugsnag
+    ["bugsnag_", "Bugsnag"],
+    // Gainsight PX
+    ["_gs_", "Gainsight"],
+    // Kustomer
+    ["_kuid", "Kustomer"],
+    // ContentStack
+    ["_cs_id", "ContentStack"],
+    // Algolia
+    ["_algolia", "Algolia"],
+    // Awin
+    ["_aw_m_", "Awin"],
+    // Bazaarvoice
+    ["BVImpl", "Bazaarvoice"], ["BVBRANDID", "Bazaarvoice"],
   ];
 
   const vendorDomains = {
@@ -1927,6 +2027,136 @@
     "geteppo.com": "Eppo",
     // ContentKing
     "contentkingapp.com": "ContentKing",
+    // Hightouch
+    "hightouch.com": "Hightouch", "htevents.com": "Hightouch",
+    // Bloomreach
+    "bloomreach.com": "Bloomreach", "brxcdn.com": "Bloomreach",
+    // Demandbase
+    "demandbase.com": "Demandbase",
+    // 6sense
+    "6sense.com": "6sense", "6sc.co": "6sense",
+    // ZoomInfo
+    "zoominfo.com": "ZoomInfo", "ws.zoominfo.com": "ZoomInfo",
+    // Clearbit
+    "clearbit.com": "Clearbit",
+    // Customer.io
+    "customer.io": "Customer.io",
+    // Chameleon
+    "chameleon.io": "Chameleon",
+    // Sprig
+    "sprig.com": "Sprig",
+    // Refiner
+    "refiner.io": "Refiner",
+    // Bombora
+    "bombora.com": "Bombora",
+    // Impact.com
+    "impact.com": "Impact.com", "impactradius.com": "Impact.com",
+    // Commission Junction
+    "cj.com": "Commission Junction",
+    // ShareASale
+    "shareasale.com": "ShareASale",
+    // Rakuten
+    "rakuten.com": "Rakuten",
+    // Awin
+    "awin1.com": "Awin", "awin.com": "Awin",
+    // ClickCease
+    "clickcease.com": "ClickCease",
+    // WebEngage
+    "webengage.com": "WebEngage",
+    // CleverTap
+    "clevertap.com": "CleverTap", "wzrkt.com": "CleverTap",
+    // MoEngage
+    "moengage.com": "MoEngage",
+    // Insider
+    "useinsider.com": "Insider",
+    // Sailthru
+    "sailthru.com": "Sailthru",
+    // Listrak
+    "listrak.com": "Listrak",
+    // Attentive
+    "attentivemobile.com": "Attentive", "attn.tv": "Attentive",
+    // Yotpo
+    "yotpo.com": "Yotpo",
+    // Bazaarvoice
+    "bazaarvoice.com": "Bazaarvoice",
+    // Coveo
+    "coveo.com": "Coveo",
+    // Algolia
+    "algolia.com": "Algolia", "algolia.net": "Algolia",
+    // SpeedCurve
+    "speedcurve.com": "SpeedCurve LUX",
+    // Sentry
+    "sentry.io": "Sentry",
+    // Rollbar
+    "rollbar.com": "Rollbar",
+    // Bugsnag
+    "bugsnag.com": "Bugsnag",
+    // Gainsight
+    "gainsight.com": "Gainsight",
+    // Kustomer
+    "kustomer.com": "Kustomer",
+    // ContentStack
+    "contentstack.com": "ContentStack", "contentstack.io": "ContentStack",
+    // Contentful
+    "contentful.com": "Contentful",
+    // Sanity
+    "sanity.io": "Sanity",
+    // Storyblok
+    "storyblok.com": "Storyblok",
+    // Builder.io
+    "builder.io": "Builder.io",
+    // Netlify
+    "netlify.com": "Netlify", "netlify.app": "Netlify",
+    // Vercel
+    "vercel.com": "Vercel", "vercel.app": "Vercel",
+    // Cloudinary
+    "cloudinary.com": "Cloudinary",
+    // Imgix
+    "imgix.net": "Imgix",
+    // Twilio
+    "twilio.com": "Twilio",
+    // SendGrid
+    "sendgrid.net": "SendGrid", "sendgrid.com": "SendGrid",
+    // Mailgun
+    "mailgun.com": "Mailgun",
+    // Mandrill
+    "mandrillapp.com": "Mandrill",
+    // Cookiefirst
+    "cookiefirst.com": "CookieFirst",
+    // Osano
+    "osano.com": "Osano",
+    // Transcend
+    "transcend.io": "Transcend",
+    // DataGrail
+    "datagrail.io": "DataGrail",
+    // Ketch
+    "ketch.com": "Ketch",
+    // Commanders Act
+    "tagcommander.com": "Commanders Act",
+    // Ensighten
+    "ensighten.com": "Ensighten",
+    // Signal (now TransUnion)
+    "signal.co": "Signal",
+    // MediaMath
+    "mathtag.com": "MediaMath",
+    // Lotame (expanded)
+    "crwdcntrl.net": "Lotame",
+    // Outbrain (expanded)
+    "outbrainsdk.com": "Outbrain",
+    // Taboola (expanded)
+    "taboola.com": "Taboola", "taboolasyndication.com": "Taboola",
+    // Sprinklr
+    "sprinklr.com": "Sprinklr",
+    // Conductor
+    "conductor.com": "Conductor",
+    // Recurly
+    "recurly.com": "Recurly",
+    // Chargebee
+    "chargebee.com": "Chargebee",
+    // Zuora
+    "zuora.com": "Zuora",
+    // Pelcro
+    "pelcro.com": "Pelcro",
   };
 
   function identifyVendor(cookieName, domain) {
@@ -1949,23 +2179,6 @@
   }
 
   // ===== Utilities =====
-  function securityScore(cookie) {
-    let score = 0;
-    if (cookie.secure) score++;
-    if (cookie.httpOnly) score++;
-    if (cookie.sameSite === "strict") score += 2;
-    else if (cookie.sameSite === "lax") score++;
-    return score;
-  }
-
-  function securityClass(cookie) {
-    const s = securityScore(cookie);
-    if (s >= 3) return "security-high";
-    if (s >= 2) return "security-medium";
-    if (s >= 1) return "security-low";
-    return "security-none";
-  }
-
   function formatBytes(bytes) {
     if (bytes < 1024) return bytes + " B";
     return (bytes / 1024).toFixed(1) + " KB";
