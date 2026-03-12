@@ -34,6 +34,7 @@
     sessionCount: $("#sessionCount"),
     typeCard: $("#typeCard"),
     searchInput: $("#searchInput"),
+    searchClear: $("#searchClear"),
     sortSelect: $("#sortSelect"),
     vendorSelect: $("#vendorSelect"),
     cookieGrid: $("#cookieGrid"),
@@ -1121,12 +1122,23 @@
     let searchTimeout;
     dom.searchInput.addEventListener("input", (e) => {
       clearTimeout(searchTimeout);
+      dom.searchClear.classList.toggle("visible", e.target.value.length > 0);
       searchTimeout = setTimeout(() => {
         state.search = e.target.value.trim();
         renderFloatingCookies();
         renderCookies();
         renderFeed();
       }, 200);
+    });
+
+    dom.searchClear.addEventListener("click", () => {
+      dom.searchInput.value = "";
+      dom.searchClear.classList.remove("visible");
+      state.search = "";
+      renderFloatingCookies();
+      renderCookies();
+      renderFeed();
+      dom.searchInput.focus();
     });
 
     for (const chip of $$(".chip")) {
