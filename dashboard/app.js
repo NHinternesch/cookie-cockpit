@@ -55,9 +55,32 @@
     localStorageMatchCount: $("#localStorageMatchCount"),
   };
 
+  // ===== Dark Mode =====
+  function initDarkMode() {
+    const toggle = $("#darkModeToggle");
+    const saved = localStorage.getItem("cookieCockpitTheme");
+    if (saved === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      toggle.setAttribute("aria-checked", "true");
+    }
+    toggle.addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (isDark) {
+        document.documentElement.removeAttribute("data-theme");
+        toggle.setAttribute("aria-checked", "false");
+        localStorage.setItem("cookieCockpitTheme", "light");
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        toggle.setAttribute("aria-checked", "true");
+        localStorage.setItem("cookieCockpitTheme", "dark");
+      }
+    });
+  }
+
   // ===== Init =====
   function init() {
     parseParams();
+    initDarkMode();
     setupParticles();
     setupConnection();
     setupEventListeners();
