@@ -191,12 +191,12 @@
   function updateVendorDropdown() {
     const cookies = Array.from(state.cookies.values());
     const vendors = new Set();
-    let hasUnknown = false;
+    let hasUnidentified = false;
 
     for (const c of cookies) {
       const v = identifyVendor(c.name, c.domain);
       if (v) vendors.add(v);
-      else hasUnknown = true;
+      else hasUnidentified = true;
     }
 
     const sorted = Array.from(vendors).sort((a, b) => a.localeCompare(b));
@@ -209,10 +209,10 @@
       opt.textContent = v;
       dom.vendorSelect.appendChild(opt);
     }
-    if (hasUnknown) {
+    if (hasUnidentified) {
       const opt = document.createElement("option");
-      opt.value = "unknown";
-      opt.textContent = "Unknown";
+      opt.value = "unidentified";
+      opt.textContent = "Unidentified";
       dom.vendorSelect.appendChild(opt);
     }
 
@@ -556,7 +556,7 @@
     }
     if (state.vendorFilter !== "all") {
       const vendor = identifyVendor(c.name, c.domain);
-      if (state.vendorFilter === "unknown") {
+      if (state.vendorFilter === "unidentified") {
         if (vendor) return false;
       } else if (vendor !== state.vendorFilter) return false;
     }
