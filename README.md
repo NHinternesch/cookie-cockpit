@@ -1,5 +1,7 @@
 # Cookie Cockpit - The All-In-One Cookie Manager
 
+<img width="1743" height="805" alt="Screenshot 2026-03-21 at 21 43 41" src="https://github.com/user-attachments/assets/204ed639-e945-4c84-aa12-a371c60c1fa1"/> <br>
+
 Cookie Cockpit is a free Chrome extension that gives you complete visibility and control over the cookies on any website. Made for web developers, mar-tech professionals, tagging specialists, implementation engineers as well as privacy-conscious users. 
 
 Cookie Cockpit combines all core functionality of a state-of-the-art cookie manager with advanced features like vendor identification, real-time monitoring, and local storage mapping — made accessible for everyone in a simple and intuitive single-page dashboard.  
