@@ -7,9 +7,8 @@ Cookie Cockpit combines all core functionality of a state-of-the-art cookie mana
 [Landing Page](https://cookie-cockpit.hinternesch.com) <br>
 [Available on the Chrome Web Store](https://chromewebstore.google.com/detail/cookie-cockpit/nlipegfmejhndebcoogldgfojaalibph)
 
-
-<img width="400" height="400" alt="cookie-cockpit-screenshot-mac" src="https://github.com/user-attachments/assets/74fa7d36-e42e-49b1-bf60-0a577988eca6" /> 
-<img width="400" height="400" alt="af819ce9-e5d9-441c-ad81-3ca7f54ba7ff (1)-front" src="https://github.com/user-attachments/assets/5b175d58-7168-43f0-aef8-e161a33c789d" />
+<img width="400" height="400" alt="cc-screenshot-mac-1" src="https://github.com/user-attachments/assets/bf4d8209-4708-4cca-b251-11309d757994" />
+<img width="400" height="400" alt="cc-screenshot-mac-2" src="https://github.com/user-attachments/assets/cf106951-13bc-4431-b292-269474d9f0e6" />
 <br>
 
 ## Key Features
