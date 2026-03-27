@@ -17,10 +17,9 @@
           <img class="logo-icon" src="../icons/icon48.png" alt="Cookie Cockpit" />
           <h1>Cookie Cockpit</h1>
         </div>
-        <p class="monitored-url" id="monitoredUrl">Loading...</p>
       </div>
       <div class="header-right">
-        <span class="byline">By <a href="https://hinternesch.com" target="_blank">Nicolas Hinternesch</a> ┃ Feedback and Requests <a href="https://hinternesch.com/contact.html" target="_blank">✉️</a> ┃ <span class="theme-switch"><span class="theme-label">Light</span><button id="darkModeToggle" class="theme-toggle" role="switch" aria-checked="false" title="Toggle dark mode"><span class="theme-toggle-knob"></span></button><span class="theme-label">Dark</span></span></span>
+        <span class="byline">By <a href="https://hinternesch.com" target="_blank">Nicolas Hinternesch</a> ┃ Feedback and Requests <a href="https://hinternesch.com/contact.html" target="_blank">✉️</a> ┃ <span class="theme-switch"><button id="darkModeToggle" class="theme-toggle" role="switch" aria-checked="false" title="Toggle dark mode"><svg class="theme-toggle-icon theme-icon-light" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><svg class="theme-toggle-icon theme-icon-dark" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="theme-toggle-knob"></span></button></span></span>
       </div>
     </header>
 
@@ -113,6 +112,14 @@
       <div class="visual-area">
         <div class="imac-wrapper">
           <div class="imac-frame">
+            <div class="imac-toolbar">
+              <div class="imac-traffic-lights">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="imac-url-bar" id="monitoredUrl">Loading...</div>
+            </div>
             <div class="imac-screen">
               <img id="siteScreenshot" alt="" />
               <div class="imac-placeholder" id="screenshotPlaceholder">

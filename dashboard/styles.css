@@ -197,47 +197,58 @@ body {
   vertical-align: middle;
 }
 
-.theme-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  user-select: none;
-  transition: color 0.2s;
-}
-
-.theme-label:first-child {
-  color: var(--text-secondary);
-}
-
-[data-theme="dark"] .theme-label:first-child {
-  color: var(--text-muted);
-}
-
-[data-theme="dark"] .theme-label:last-child {
-  color: var(--text-secondary);
-}
-
 .theme-toggle {
   position: relative;
-  width: 34px;
-  height: 18px;
+  width: 44px;
+  height: 22px;
   background: var(--border-light);
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 11px;
   cursor: pointer;
   padding: 0;
   transition: background 0.2s, border-color 0.2s;
+  overflow: hidden;
 }
 
 .theme-toggle:hover {
   border-color: var(--text-muted);
 }
 
+.theme-toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 0.2s;
+  color: #888;
+}
+
+.theme-icon-light {
+  left: 4px;
+  opacity: 1;
+}
+
+.theme-icon-dark {
+  right: 4px;
+  opacity: 0.4;
+}
+
+[data-theme="dark"] .theme-icon-light {
+  opacity: 0.6;
+  color: #ccc;
+}
+
+[data-theme="dark"] .theme-icon-dark {
+  opacity: 1;
+  color: #aaa;
+}
+
 .theme-toggle-knob {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background: var(--text-secondary);
   border-radius: 50%;
   transition: transform 0.2s ease;
@@ -249,7 +260,7 @@ body {
 }
 
 [data-theme="dark"] .theme-toggle-knob {
-  transform: translateX(16px);
+  transform: translateX(22px);
 }
 
 /* Dark mode: match title color to domain text */
@@ -270,13 +281,7 @@ body {
 }
 
 .monitored-url {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  max-width: 600px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: none;
 }
 
 .live-badge {
@@ -702,10 +707,58 @@ body {
   max-width: 100%;
 }
 
+.imac-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, #e0e0e4, #d4d4d8);
+  border-radius: 4px 4px 0 0;
+}
+
+.imac-traffic-lights {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.imac-traffic-lights .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.imac-traffic-lights .dot.red { background: #ff5f57; }
+.imac-traffic-lights .dot.yellow { background: #febc2e; }
+.imac-traffic-lights .dot.green { background: #28c840; }
+
+.imac-url-bar {
+  flex: 1;
+  background: #fff;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .imac-toolbar {
+  background: linear-gradient(180deg, #3a3a40, #2e2e34);
+}
+
+[data-theme="dark"] .imac-url-bar {
+  background: #1e1e24;
+  color: #ccc;
+}
+
 .imac-screen {
   width: 100%;
   aspect-ratio: 16 / 10;
-  border-radius: 4px;
+  border-radius: 0 0 4px 4px;
   overflow: hidden;
   background: #1a1a2e;
   position: relative;
