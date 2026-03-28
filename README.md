@@ -17,7 +17,7 @@ Cookie Cockpit combines all core functionality of a state-of-the-art cookie mana
 View all cookies for the current site in a clean list view and advanced detail view. Filter, sort, and search cookies by domain, name, value, or vendor. Elegant modern design with full dark mode support. 
 
 • **Real-Time Monitoring, Local Storage Mapping** <br>
-Listen to cookie changes in real-time and monitor new, modified, and deleted cookies. Map cookie values against local storage to identify sitest persisting IDs beyond cookies across browser storage methods.
+Listen to cookie changes in real-time and monitor new, modified, and deleted cookies. Map cookie values against local storage to identify sites persisting IDs beyond cookies across browser storage methods.
 
 • **Vendor Identification** <br>
 Recognize and filter cookies from known vendors, ad networks, analytics providers, and other third-parties - helping you understand who is setting cookies and why.
