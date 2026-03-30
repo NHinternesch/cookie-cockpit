@@ -657,6 +657,7 @@
         <textarea class="modal-value modal-value-edit" id="modalValueEdit">${esc(cookie.value)}</textarea>
         <div class="modal-value-actions">
           <button class="copy-btn" id="copyValueBtn">Copy value</button>
+          <button class="copy-btn" id="copyDecodedBtn">Copy decoded value</button>
           <button class="copy-btn save-btn" id="saveValueBtn">Save</button>
           <button class="delete-btn" id="deleteBtn">Delete</button>
         </div>
@@ -731,6 +732,7 @@
 
     const textarea = dom.modalContent.querySelector("#modalValueEdit");
     const copyBtn = dom.modalContent.querySelector("#copyValueBtn");
+    const copyDecodedBtn = dom.modalContent.querySelector("#copyDecodedBtn");
     const saveBtn = dom.modalContent.querySelector("#saveValueBtn");
     const deleteBtn = dom.modalContent.querySelector("#deleteBtn");
     const secureCheck = dom.modalContent.querySelector("#modalSecure");
@@ -805,6 +807,17 @@
         setTimeout(() => {
           copyBtn.textContent = "Copy value";
           copyBtn.classList.remove("copied");
+        }, 1500);
+      });
+    });
+
+    copyDecodedBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(decodeURIComponent(textarea.value)).then(() => {
+        copyDecodedBtn.textContent = "Copied!";
+        copyDecodedBtn.classList.add("copied");
+        setTimeout(() => {
+          copyDecodedBtn.textContent = "Copy decoded value";
+          copyDecodedBtn.classList.remove("copied");
         }, 1500);
       });
     });
